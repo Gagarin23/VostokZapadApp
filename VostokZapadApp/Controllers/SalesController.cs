@@ -15,12 +15,12 @@ namespace VostokZapadApp.Controllers
     public class SalesController : ControllerBase
     {
         private readonly ISalesService _salesService;
-        private readonly IValidateService _validateService;
+        private readonly IOrdersValidateService _ordersValidateService;
 
-        public SalesController(ISalesService salesService, IValidateService validateService)
+        public SalesController(ISalesService salesService, IOrdersValidateService ordersValidateService)
         {
             _salesService = salesService;
-            _validateService = validateService;
+            _ordersValidateService = ordersValidateService;
         }
 
         /// <summary>
@@ -77,20 +77,6 @@ namespace VostokZapadApp.Controllers
         }
 
         /// <summary>
-        /// Добавить покупателя.
-        /// </summary>
-        /// <param name="customerName"></param>
-        /// <returns></returns>
-        [HttpPost("/addcustomer")]
-        public async Task<ActionResult> AddCustomer(string customerName)
-        {
-            if (string.IsNullOrWhiteSpace(customerName))
-                return BadRequest();
-
-            return await _validateService.AddCustomer(customerName);
-        }
-
-        /// <summary>
         /// Добавить заказ.
         /// </summary>
         /// <param name="date">MM/dd/yyyy</param>
@@ -104,7 +90,7 @@ namespace VostokZapadApp.Controllers
             if (date == DateTime.MinValue || documentId == 0 || sum <= 0 || string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
 
-            return await _validateService.AddOrder(date, documentId, sum, customerName);
+            return await _ordersValidateService.AddOrderAsync(date, documentId, sum, customerName);
         }
     }
 }

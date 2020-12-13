@@ -88,19 +88,29 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                       "ELSE" +
                       "    BEGIN" +
                       "        INSERT INTO Customers (Name) VALUES (@Name) " +
-                      "        RETURN 201" +
+                      "        RETURN 201 " +
                       "    END";
-
+            
+            //выдает ошибку если включаю return:
+            //A MERGE statement must be terminated by a semi-colon (;).
+            //куда лепить ; так и не понял.
             var updateOrInsert = $"CREATE PROCEDURE {CustomerProcedures.UpdateOrInsertCustomer}( " +
                                  "@Id INT, @Name NVARCHAR(50)) AS " +
+                                 //"BEGIN " +
                                  "MERGE " +
                                  "INTO Customer WITH (HOLDLOCK) AS target " +
                                  "USING (SELECT @Id as id, @Name as name) as src (id, name) " +
                                  "ON (target.Id = src.id) " +
                                  "WHEN MATCHED " +
-                                 "   THEN UPDATE SET target.Name = src.name RETURN 200" +
+                                 "   THEN UPDATE " +
+                                 "      SET target.Name = src.name " +
+                                 //"      RETURN 200 " +
                                  "WHEN NOT MATCHED " +
-                                 "   THEN INSERT(name) VALUES(src.name) RETURN 201";
+                                 "   THEN INSERT(name) " +
+                                 "      VALUES(src.name) ";
+                                 //"      RETURN 400 \r\n" +
+                                 //"; \r\n" +
+                                 //"END;"
 
             var remove = $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomer}( " +
                          "@Name NVARCHAR(50)) AS " +

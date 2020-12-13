@@ -18,7 +18,7 @@ namespace VostokZapadApp.Infrastructure.Data.Tests
             var rep = new CustomerRepository(new SqlConnection(
                 "Server=(localdb)\\mssqllocaldb;Database=VostokZapadDb;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
-            await rep.RemoveAsync("TestName");
+            await rep.RemoveAsync("TestName2");
         }
     }
 }

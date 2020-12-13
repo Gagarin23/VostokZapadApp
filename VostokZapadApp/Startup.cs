@@ -39,9 +39,12 @@ namespace VostokZapadApp
             services.AddSingleton<IDatabaseInitialiser, DatabaseInitialiser>(provider => new DatabaseInitialiser("VostokZapadDb"));
 
             services.AddScoped<ISalesService, SalesService>();
-            services.AddScoped<IValidateService, ValidateService>();
+            services.AddScoped<IOrdersValidateService, OrdersValidateService>();
+            services.AddScoped<ICustomersValidateService, CustomersValidateService>();
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
+
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

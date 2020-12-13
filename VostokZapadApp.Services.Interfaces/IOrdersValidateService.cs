@@ -9,9 +9,8 @@ using VostokZapadApp.Domain.Core.DataBase;
 
 namespace VostokZapadApp.Services.Interfaces
 {
-    public interface IValidateService
+    public interface IOrdersValidateService
     {
-        Task<ActionResult> AddOrder(DateTime date, int documentId, decimal sum, string customerName);
-        Task<ActionResult> AddCustomer(string customerName);
+        Task<ActionResult> AddOrderAsync(DateTime date, int documentId, decimal sum, string customerName);
     }
 }
