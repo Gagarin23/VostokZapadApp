@@ -21,6 +21,8 @@ namespace VostokZapadApp.Infrastructure.Business
 
         public async Task<ActionResult> AddOrder(DateTime date, int documentId, decimal sum, string customerName)
         {
+            #region КостыльЗаКоторыйМнеСтыдно
+
             var customer = (await _customerRepository.GetAsync(customerName)).Value;
             if (customer == null)
             {
@@ -29,6 +31,9 @@ namespace VostokZapadApp.Infrastructure.Business
                 if(customer == null)
                     return new StatusCodeResult(500);
             }
+
+            #endregion
+
             //...еще какая-то валидация.
 
             var order = new Order
@@ -40,11 +45,7 @@ namespace VostokZapadApp.Infrastructure.Business
                 CustomerId = customer.Id
             };
 
-            var result = await _orderRepository.AddAsync(order);
-            if(result.Value == null)
-                return new StatusCodeResult(500);
-
-            return new OkResult();
+            return await _orderRepository.AddAsync(order);
         }
 
         public async Task<ActionResult> AddCustomer(string customerName)

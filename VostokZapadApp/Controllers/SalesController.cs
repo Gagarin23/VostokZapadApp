@@ -23,52 +23,55 @@ namespace VostokZapadApp.Controllers
             _validateService = validateService;
         }
 
-        [HttpGet]
+        [HttpGet("/all")]
         public async Task<ActionResult<List<Sales>>> GetAll()
         {
             return await _salesService.GetAllAsync();
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<Sales>>> GetByDate(DateTime min, DateTime max)
+        [HttpGet("/bydate")]
+        public async Task<ActionResult<List<Sales>>> GetByDate([FromHeader(Name = "Min-Date")]DateTime min, [FromHeader(Name = "Max-Date")]DateTime max)
         {
+            if (min > max)
+                return BadRequest();
+
             return await _salesService.GetByDateAsync(min, max);
         }
 
-        [HttpGet]
+        [HttpGet("/bycustomer")]
         public async Task<ActionResult<Sales>> GetByCustomer(string customerName)
         {
-            if(string.IsNullOrWhiteSpace(customerName))
+            if (string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
 
             return await _salesService.GetByCustomerAsync(customerName);
         }
 
-        [HttpGet]
+        [HttpGet("/bydocid")]
         public async Task<ActionResult<Sales>> GetById(int documentId)
         {
-            if(documentId == 0)
+            if (documentId == 0)
                 return BadRequest();
 
             return await _salesService.GetByDocIdAsync(documentId);
         }
 
-        [HttpPost]
+        [HttpPost("/addcustomer")]
         public async Task<ActionResult> AddCustomer(string customerName)
         {
-            if(string.IsNullOrWhiteSpace(customerName))
+            if (string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
 
-
+            return await _validateService.AddCustomer(customerName);
         }
 
-        [HttpPost]
+        [HttpPost("/addorder")]
         public async Task<ActionResult> AddOrder(DateTime date, int documentId, decimal sum, string customerName) //По хорошему тут должена быть своя абстракция на входные данные.
         {
-            if(date == DateTime.MinValue || documentId == 0 || sum <= 0 || string.IsNullOrWhiteSpace(customerName))
+            if (date == DateTime.MinValue || documentId == 0 || sum <= 0 || string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
 
-
-        } 
+            return await _validateService.AddOrder(date, documentId, sum, customerName);
+        }
     }
 }

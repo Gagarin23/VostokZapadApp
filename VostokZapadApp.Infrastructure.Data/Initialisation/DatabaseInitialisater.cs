@@ -44,7 +44,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
             string queryShops = $"USE {_databaseName} " +
                                 "CREATE TABLE Customers " +
                                 "(Id INT IDENTITY PRIMARY KEY, " +
-                                "Name NVARCHAR(50))";
+                                "Name NVARCHAR(50) UNIQUE)";
 
             string queryProducts = $"USE {_databaseName} " +
                                    "CREATE TABLE Orders " +
