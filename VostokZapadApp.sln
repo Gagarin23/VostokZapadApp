@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Infrastructu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Infrastructure.Business", "VostokZapadApp.Infrastructure.Business\VostokZapadApp.Infrastructure.Business.csproj", "{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VostokZapadApp.Infrastructure.DataTests", "VostokZapadApp.Infrastructure.DataTests\VostokZapadApp.Infrastructure.DataTests.csproj", "{5B486895-1B76-4DDD-81D2-0147FB6A80AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B486895-1B76-4DDD-81D2-0147FB6A80AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B486895-1B76-4DDD-81D2-0147FB6A80AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B486895-1B76-4DDD-81D2-0147FB6A80AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B486895-1B76-4DDD-81D2-0147FB6A80AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

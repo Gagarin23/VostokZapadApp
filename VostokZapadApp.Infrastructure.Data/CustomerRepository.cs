@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using VostokZapadApp.Domain.Core;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
+using VostokZapadApp.Infrastructure.Data.Initialisation;
 
 namespace VostokZapadApp.Infrastructure.Data
 {
@@ -26,63 +27,59 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<Customer>> GetAsync(string name)
         {
-            var sql = "SELECT TOP(1) Id, Name FROM Customers " +
-                      "WHERE Name = @name";
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerByName, new {name}, 
+                commandType: CommandType.StoredProcedure);
 
-            return await _dbConnection.QueryFirstOrDefaultAsync<Customer>(sql, new {name});
+            if (result != null)
+                return result;
+
+            return new NotFoundResult();
         }
 
         public async Task<ActionResult<Customer>> GetAsync(int id)
         {
-            var sql = "SELECT TOP(1) Id, Name FROM Customers " +
-                      "WHERE Id = @id";
+            var result =  await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerById, new {id},
+                commandType: CommandType.StoredProcedure);
 
-            return await _dbConnection.QueryFirstOrDefaultAsync<Customer>(sql, new {id});
+            if (result != null)
+                return result;
+
+            return new NotFoundResult();
         }
 
-        public async Task<ActionResult> AddOrUpdateAsync(Customer customer)
+        public async Task<ActionResult> AddAsync(Customer customer)
         {
-            var sql = "INSERT INTO Customers (Name) " +
-                      "VALUES (@name)";
-
-
             var parameters = new DynamicParameters();
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
+            parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            var rows = await _dbConnection.ExecuteAsync(sql, parameters);
-            if(rows > 0)
-                return new StatusCodeResult(201);
+            await _dbConnection.ExecuteAsync(CustomerProcedures.AddCustomer, parameters,
+                commandType: CommandType.StoredProcedure);
 
-            return new StatusCodeResult(500);
+            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
 
         public async Task<ActionResult> UpdateOrInsertAsync(Customer customer)
         {
-            var sql = "MERGE " +
-                      "INTO Customer WITH (HOLDLOCK) AS target " +
-                      "USING (SELECT @id as id, @name as name) as src (id, name) " +
-                      "ON (target.Id = src.id) " +
-                      "WHEN MATCHED " +
-                      "   THEN UPDATE " +
-                      "       SET target.Name = src.name " +
-                      "WHEN NOT MATCHED " +
-                      "   THEN INSERT(name) " +
-                      "       VALUES(src.name);";
-
             var parameters = new DynamicParameters();
             parameters.Add("@id", customer.Id, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
+            parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            var result = await _dbConnection.ExecuteAsync(sql, parameters);
-            if (result > 1)
-                return new OkResult();
+            await _dbConnection.ExecuteAsync(CustomerProcedures.UpdateOrInsertCustomer, parameters);;
 
-            return new StatusCodeResult(500);
+            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
 
         public async Task<ActionResult> RemoveAsync(string customerName)
         {
-            throw new NotImplementedException();
+            var parameters = new DynamicParameters();
+            parameters.Add("@name", customerName, DbType.String, ParameterDirection.Input);
+            parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomer, parameters, commandType: CommandType.StoredProcedure);
+
+            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
     }
 }

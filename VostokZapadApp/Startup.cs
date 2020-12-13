@@ -63,6 +63,8 @@ namespace VostokZapadApp
 
             initialiser.CreateDatabase();
             initialiser.CreateTables();
+            initialiser.CreateCustomersProcedures();
+            initialiser.CreateOrdersProcedures();
 
             app.UseHttpsRedirection();
 

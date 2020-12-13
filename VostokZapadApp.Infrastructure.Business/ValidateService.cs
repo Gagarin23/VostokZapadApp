@@ -50,7 +50,7 @@ namespace VostokZapadApp.Infrastructure.Business
         public async Task<ActionResult> AddCustomer(string customerName)
         {
             var customer = new Customer{Name = customerName};
-            return await _customerRepository.AddOrUpdateAsync(customer);
+            return await _customerRepository.AddAsync(customer);
         }
     }
 }
