@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VostokZapadApp.Domain.Core;
+using VostokZapadApp.Domain.Core.DataBase;
 
 namespace VostokZapadApp.Domain.Interfaces
 {
     public interface ICustomerRepository
     {
-        Task<ActionResult<Customer>> GetByDocId(int documentId);
-        Task<ActionResult> Add(Customer customer);
-        Task<ActionResult> UpdateOrInsert(Customer customer);
-        Task<ActionResult> Remove(int customerName);
+        Task<ActionResult<Customer>> GetAsync(string customerName);
+        Task<ActionResult> AddAsync(Customer customer);
+        Task<ActionResult> UpdateOrInsertAsync(Customer customer);
+        Task<ActionResult> RemoveAsync(string customerName);
     }
 }

@@ -5,28 +5,29 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VostokZapadApp.Domain.Core;
+using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
 
 namespace VostokZapadApp.Infrastructure.Data
 {
     public class CustomerRepository : ICustomerRepository
     {
-        public Task<ActionResult<Customer>> GetByDocId(int documentId)
+        public async Task<ActionResult<Customer>> GetAsync(string customerName)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ActionResult> Add(Customer customer)
+        public async Task<ActionResult> AddAsync(Customer customer)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ActionResult> UpdateOrInsert(Customer customer)
+        public async Task<ActionResult> UpdateOrInsertAsync(Customer customer)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ActionResult> Remove(int customerName)
+        public async Task<ActionResult> RemoveAsync(string customerName)
         {
             throw new NotImplementedException();
         }

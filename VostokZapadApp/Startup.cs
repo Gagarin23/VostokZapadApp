@@ -9,9 +9,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using VostokZapadApp.Domain.Interfaces;
 using VostokZapadApp.Infrastructure.Business;
+using VostokZapadApp.Infrastructure.Data;
+using VostokZapadApp.Infrastructure.Data.Initialisation;
 using VostokZapadApp.Services.Interfaces;
 
 namespace VostokZapadApp
@@ -27,8 +32,14 @@ namespace VostokZapadApp
 
         public void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = Configuration.GetConnectionString("WorkConnection");
+            services.AddTransient<IDbConnection, SqlConnection>(provider => new SqlConnection(connectionString));
+            services.AddSingleton<IDatabaseInitialiser, DatabaseInitialiser>(provider => new DatabaseInitialiser("VostokZapadDb"));
+
             services.AddScoped<ISalesService, SalesService>();
-            services.AddScoped<IValidaterService, ValidaterService>();
+            services.AddScoped<IValidateService, ValidateService>();
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
+            services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

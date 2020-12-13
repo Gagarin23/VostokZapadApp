@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VostokZapadApp.Domain.Core;
+using VostokZapadApp.Domain.Core.DataBase;
 
 namespace VostokZapadApp.Infrastructure.Data
 {

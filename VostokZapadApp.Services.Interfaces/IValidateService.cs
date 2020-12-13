@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VostokZapadApp.Domain.Core;
+using VostokZapadApp.Domain.Core.DataBase;
 
 namespace VostokZapadApp.Services.Interfaces
 {
-    public interface IValidaterService
+    public interface IValidateService
     {
-        Task<ActionResult<Sales>> Validate(Sales sales);
+        Task<ActionResult> AddOrder(DateTime date, int documentId, decimal sum, string customerName);
+        Task<ActionResult> AddCustomer(string customerName);
     }
 }
