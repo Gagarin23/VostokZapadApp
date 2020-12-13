@@ -58,7 +58,26 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult> UpdateOrInsertAsync(Customer customer)
         {
-            throw new NotImplementedException();
+            var sql = "MERGE " +
+                      "INTO Customer WITH (HOLDLOCK) AS target " +
+                      "USING (SELECT @id as id, @name as name) as src (id, name) " +
+                      "ON (target.Id = src.id) " +
+                      "WHEN MATCHED " +
+                      "   THEN UPDATE " +
+                      "       SET target.Name = src.name " +
+                      "WHEN NOT MATCHED " +
+                      "   THEN INSERT(name) " +
+                      "       VALUES(src.name);";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@id", customer.Id, DbType.Int32, ParameterDirection.Input);
+            parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
+
+            var result = await _dbConnection.ExecuteAsync(sql, parameters);
+            if (result > 1)
+                return new OkResult();
+
+            return new StatusCodeResult(500);
         }
 
         public async Task<ActionResult> RemoveAsync(string customerName)

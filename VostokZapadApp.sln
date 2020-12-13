@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Infrastructu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Infrastructure.Business", "VostokZapadApp.Infrastructure.Business\VostokZapadApp.Infrastructure.Business.csproj", "{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetailRocketTestSolution", "..\RetailRocketTestSolution\RetailRocketTestSolution\RetailRocketTestSolution.csproj", "{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,10 +51,6 @@ Global
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

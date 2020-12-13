@@ -96,7 +96,35 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult> UpdateOrInsertAsync(Order order)
         {
-            throw new NotImplementedException();
+            var sql = "MERGE " +
+                      "INTO Orders WITH (HOLDLOCK) AS target " +
+                      "USING (SELECT " +
+                      "@docDate as docDate," +
+                      "@docId as docId," +
+                      "@orderSum as orderSum," +
+                      "@customerId as customerId) as src (docDate, docId, orderSum, customerId) " +
+                      "ON (target.DocumentId = src.docId) " +
+                      "WHEN MATCHED " +
+                      "   THEN UPDATE " +
+                      "       SET target.DocDate = src.docDate, " +
+                      "         target.DocId = src.docId, " +
+                      "         target.OrderSum = src.orderSum," +
+                      "         target.CustomerId = src.customerId" +
+                      "WHEN NOT MATCHED " +
+                      "   THEN INSERT(docDate, docId, orderSum, customerId) " +
+                      "       VALUES(src.docDate, src.docId, src.orderSum, src.customerId);";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@docDate", order.DateTime, DbType.Date, ParameterDirection.Input);
+            parameters.Add("@docId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
+            parameters.Add("@orderSum", order.OrderSum, DbType.Decimal, ParameterDirection.Input);
+            parameters.Add("@customerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
+
+            var result = await _db.ExecuteAsync(sql, parameters);
+            if(result > 1)
+                return new OkResult();
+
+            return new StatusCodeResult(500);
         }
 
         public async Task<ActionResult> RemoveAsync(int documentId)
