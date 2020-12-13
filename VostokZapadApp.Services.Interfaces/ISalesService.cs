@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
-namespace VostokZapadApp.Infrastructure.Data
+namespace VostokZapadApp.Services.Interfaces
 {
-    class OrderContext : DbContext
+    public interface ISalesService
     {
     }
 }

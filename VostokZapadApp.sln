@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30803.129
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VostokZapadApp", "VostokZapadApp\VostokZapadApp.csproj", "{44C58A2B-578D-4235-8E4D-094B73B37377}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp", "VostokZapadApp\VostokZapadApp.csproj", "{44C58A2B-578D-4235-8E4D-094B73B37377}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{D443475C-6DC5-4C83-9499-FE43F2EC7590}"
 EndProject
@@ -11,15 +11,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{3CD0150C-0094-4350-B0D0-0490B1B3E70A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VostokZapadApp.Domain.Core", "VostokZapadApp.Domain.Core\VostokZapadApp.Domain.Core.csproj", "{23EDE189-4D69-458E-B104-BCE85D11A9C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Domain.Core", "VostokZapadApp.Domain.Core\VostokZapadApp.Domain.Core.csproj", "{23EDE189-4D69-458E-B104-BCE85D11A9C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VostokZapadApp.Domain.Interfaces", "VostokZapadApp.Domain.Interfaces\VostokZapadApp.Domain.Interfaces.csproj", "{992A369B-5D03-4138-B5A8-BE092E01E0D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Domain.Interfaces", "VostokZapadApp.Domain.Interfaces\VostokZapadApp.Domain.Interfaces.csproj", "{992A369B-5D03-4138-B5A8-BE092E01E0D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VostokZapadApp.Services.Interfaces", "VostokZapadApp.Services.Interfaces\VostokZapadApp.Services.Interfaces.csproj", "{82ADBE0E-441B-4CBC-B850-1B3E508EE338}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Services.Interfaces", "VostokZapadApp.Services.Interfaces\VostokZapadApp.Services.Interfaces.csproj", "{82ADBE0E-441B-4CBC-B850-1B3E508EE338}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VostokZapadApp.Infrastructure.Data", "VostokZapadApp.Infrastructure.Data\VostokZapadApp.Infrastructure.Data.csproj", "{18B3B5C8-FD17-4F87-8321-F127280B1A53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Infrastructure.Data", "VostokZapadApp.Infrastructure.Data\VostokZapadApp.Infrastructure.Data.csproj", "{18B3B5C8-FD17-4F87-8321-F127280B1A53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VostokZapadApp.Infrastructure.Business", "VostokZapadApp.Infrastructure.Business\VostokZapadApp.Infrastructure.Business.csproj", "{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VostokZapadApp.Infrastructure.Business", "VostokZapadApp.Infrastructure.Business\VostokZapadApp.Infrastructure.Business.csproj", "{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFDataApp", "..\HelloApp\EFDataApp\EFDataApp.csproj", "{089D54C8-C3CF-4B79-9EFE-CAF96D1AF90B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrintStationWebApi", "..\PrintStationWebApi\PrintStationWebApi\PrintStationWebApi.csproj", "{89467CA7-4833-4483-A37B-0B2DC58F4B82}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetailRocketTestSolution", "..\RetailRocketTestSolution\RetailRocketTestSolution\RetailRocketTestSolution.csproj", "{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloWebApi", "..\HelloApp\HelloWebApi\HelloWebApi.csproj", "{D8E401D5-A199-4E60-AE64-9E498BAAD1DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +59,22 @@ Global
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF8B9FDC-30EB-4E8B-B9A1-A1AD7AF004F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{089D54C8-C3CF-4B79-9EFE-CAF96D1AF90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{089D54C8-C3CF-4B79-9EFE-CAF96D1AF90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{089D54C8-C3CF-4B79-9EFE-CAF96D1AF90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{089D54C8-C3CF-4B79-9EFE-CAF96D1AF90B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89467CA7-4833-4483-A37B-0B2DC58F4B82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89467CA7-4833-4483-A37B-0B2DC58F4B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89467CA7-4833-4483-A37B-0B2DC58F4B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89467CA7-4833-4483-A37B-0B2DC58F4B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0CBA28A-9779-4F8C-AD30-EFC324DEA6A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8E401D5-A199-4E60-AE64-9E498BAAD1DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8E401D5-A199-4E60-AE64-9E498BAAD1DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8E401D5-A199-4E60-AE64-9E498BAAD1DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8E401D5-A199-4E60-AE64-9E498BAAD1DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VostokZapadApp.Infrastructure.Business;
+using VostokZapadApp.Services.Interfaces;
 
 namespace VostokZapadApp
 {
@@ -25,7 +27,8 @@ namespace VostokZapadApp
 
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddScoped<ISalesService, SalesService>();
+            services.AddScoped<IValidaterService, ValidaterService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

@@ -4,4 +4,9 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\VostokZapadApp.Infrastructure.Data\VostokZapadApp.Infrastructure.Data.csproj" />
+    <ProjectReference Include="..\VostokZapadApp.Services.Interfaces\VostokZapadApp.Services.Interfaces.csproj" />
+  </ItemGroup>
+
 </Project>
