@@ -15,53 +15,48 @@ namespace VostokZapadApp.Infrastructure.Business
     public class SalesService : ISalesService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly ICustomerRepository _customerRepository;
 
-        public SalesService(IOrderRepository orderRepository)
+        public SalesService(IOrderRepository orderRepository, ICustomerRepository customerRepository)
         {
             _orderRepository = orderRepository;
+            _customerRepository = customerRepository;
         }
 
         public async Task<ActionResult<List<Sales>>> GetAllAsync()
         {
             var orders = await _orderRepository.GetAllAsync();
-            var customers = orders.Value.Select(x => new Customer {Id = x.CustomerId, Name = x.Customer.Name}).ToList();
-
-            var allSales = new List<Sales>();
-            foreach (var customer in customers)
-            {
-                allSales.Add(new Sales
-                {
-                    Customer = customer,
-                    Orders = orders.Value.Where(x => x.CustomerId == customer.Id).ToList()
-                });
-            }
-
-            return allSales;
+            return await GetSalesAsync(orders.Value);
         }
 
         public async Task<ActionResult<List<Sales>>> GetByDateAsync(DateTime min, DateTime max)
         {
             var orders = await _orderRepository.GetByDateAsync(min, max);
-            var customers = orders.Value.Select(x => new Customer {Id = x.CustomerId, Name = x.Customer.Name}).ToList();
+            return await GetSalesAsync(orders.Value);
+        }
 
-            var salesByDate = new List<Sales>();
-            foreach (var customer in customers)
+        private async Task<List<Sales>> GetSalesAsync(List<Order> orders)
+        {
+            var customersIds = orders.Select(x => x.CustomerId).ToList();
+
+            var sales = new List<Sales>();
+            foreach (var id in customersIds)
             {
-                salesByDate.Add(new Sales
+                sales.Add(new Sales
                 {
-                    Customer = customer,
-                    Orders = orders.Value.Where(x => x.CustomerId == customer.Id).ToList()
+                    Customer = (await _customerRepository.GetAsync(id)).Value,
+                    Orders = orders.Where(x => x.CustomerId == id).ToList()
                 });
             }
 
-            return salesByDate;
-
+            return sales;
         }
 
         public async Task<ActionResult<Sales>> GetByCustomerAsync(string customerName)
         {
             var customer = new Customer{Name = customerName};
             var orders = await _orderRepository.GetByCustomerAsync(customer);
+            customer.Id = orders.Value.First().CustomerId;
             return new Sales
             {
                 Customer = customer,
@@ -74,7 +69,7 @@ namespace VostokZapadApp.Infrastructure.Business
             var order = await _orderRepository.GetByDocIdAsync(documentId);
             return new Sales
             {
-                Customer = order.Value.Customer,
+                Customer = (await _customerRepository.GetAsync(order.Value.CustomerId)).Value,
                 Orders = new List<Order> {order.Value}
             };
         }

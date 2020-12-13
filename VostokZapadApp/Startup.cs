@@ -52,7 +52,7 @@ namespace VostokZapadApp
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDatabaseInitialiser initialiser)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +60,9 @@ namespace VostokZapadApp
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "VostokZapadApp v1"));
             }
+
+            initialiser.CreateDatabase();
+            initialiser.CreateTables();
 
             app.UseHttpsRedirection();
 

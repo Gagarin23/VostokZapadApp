@@ -11,6 +11,5 @@ namespace VostokZapadApp.Domain.Core.DataBase
         public int DocumentId { get; set; } 
         public decimal OrderSum { get; set; }
         public int CustomerId { get; set; }
-        public Customer Customer { get; set; }
     }
 }

@@ -37,7 +37,7 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<Order>> GetByDocIdAsync(int documentId)
         {
-            var sql = "SELECT TOP(1) * FROM ORDERS as O" +
+            var sql = "SELECT TOP(1) * FROM ORDERS as O " +
                       "WHERE O.DocumentId = @documentId";
 
             var result = await _db.QueryFirstOrDefaultAsync<Order>(sql, new{documentId});
@@ -69,7 +69,7 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@name", customer.Name);
 
-            var result = await _db.QueryAsync<Order>(sql) as List<Order> ?? new List<Order>();
+            var result = await _db.QueryAsync<Order>(sql, parameters) as List<Order> ?? new List<Order>();
             if (result.Count < 1)
                 return new NotFoundResult();
 
@@ -78,18 +78,18 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult> AddAsync(Order order)
         {
-            var sql = "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId" +
+            var sql = "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) " +
                       "VALUES (@docDate, @docId, @orderSum, @customerId)";
 
             var parameters = new DynamicParameters();
             parameters.Add("@docDate", order.DateTime, DbType.Date, ParameterDirection.Input);
             parameters.Add("@docId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@orderSum", order.OrderSum, DbType.Decimal, ParameterDirection.Input);
-            parameters.Add("@customerId", order.Customer.Id, DbType.Int32, ParameterDirection.Input);
+            parameters.Add("@customerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
 
             var result = await _db.ExecuteAsync(sql, parameters);
             if(result > 0)
-                return new OkResult();
+                return new StatusCodeResult(201);
 
             return new StatusCodeResult(500);
         }

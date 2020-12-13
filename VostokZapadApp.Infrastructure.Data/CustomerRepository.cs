@@ -32,6 +32,14 @@ namespace VostokZapadApp.Infrastructure.Data
             return await _dbConnection.QueryFirstOrDefaultAsync<Customer>(sql, new {name});
         }
 
+        public async Task<ActionResult<Customer>> GetAsync(int id)
+        {
+            var sql = "SELECT TOP(1) Id, Name FROM Customers " +
+                      "WHERE Id = @id";
+
+            return await _dbConnection.QueryFirstOrDefaultAsync<Customer>(sql, new {id});
+        }
+
         public async Task<ActionResult> AddOrUpdateAsync(Customer customer)
         {
             var sql = "INSERT INTO Customers (Name) " +
@@ -43,7 +51,7 @@ namespace VostokZapadApp.Infrastructure.Data
 
             var rows = await _dbConnection.ExecuteAsync(sql, parameters);
             if(rows > 0)
-                return new OkResult();
+                return new StatusCodeResult(201);
 
             return new StatusCodeResult(500);
         }

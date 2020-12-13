@@ -36,8 +36,8 @@ namespace VostokZapadApp.Controllers
         /// <summary>
         /// Получить заказы по дате.
         /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
+        /// <param name="min">MM/dd/yyyy</param>
+        /// <param name="max">MM/dd/yyyy</param>
         /// <returns></returns>
         [HttpGet("/bydate")]
         public async Task<ActionResult<List<Sales>>> GetByDate([FromHeader(Name = "Min-Date")]DateTime min, [FromHeader(Name = "Max-Date")]DateTime max)
@@ -93,7 +93,7 @@ namespace VostokZapadApp.Controllers
         /// <summary>
         /// Добавить заказ.
         /// </summary>
-        /// <param name="date"></param>
+        /// <param name="date">MM/dd/yyyy</param>
         /// <param name="documentId"></param>
         /// <param name="sum"></param>
         /// <param name="customerName"></param>

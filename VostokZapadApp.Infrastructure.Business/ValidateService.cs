@@ -41,7 +41,6 @@ namespace VostokZapadApp.Infrastructure.Business
                 DateTime = date,
                 DocumentId = documentId,
                 OrderSum = sum,
-                Customer = customer,
                 CustomerId = customer.Id
             };
 
