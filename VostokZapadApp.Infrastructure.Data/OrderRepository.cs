@@ -28,7 +28,11 @@ namespace VostokZapadApp.Infrastructure.Data
         {
             var sql = "SELECT * FROM ORDERS";
 
-            return await _db.QueryAsync<Order>(sql) as List<Order> ?? throw new Exception("Empty result from db.");
+            var result = await _db.QueryAsync<Order>(sql) as List<Order> ?? new List<Order>();
+            if(result.Count < 1)
+                return new NotFoundResult();
+
+            return result;
         }
 
         public async Task<ActionResult<Order>> GetByDocIdAsync(int documentId)
@@ -36,7 +40,11 @@ namespace VostokZapadApp.Infrastructure.Data
             var sql = "SELECT TOP(1) * FROM ORDERS as O" +
                       "WHERE O.DocumentId = @documentId";
 
-            return await _db.QueryFirstOrDefaultAsync<Order>(sql, new{documentId}) ?? throw new Exception("Empty result from db.");
+            var result = await _db.QueryFirstOrDefaultAsync<Order>(sql, new{documentId});
+            if(result == null)
+                return new NotFoundResult();
+
+            return result;
         }
 
         public async Task<ActionResult<List<Order>>> GetByDateAsync(DateTime minDate, DateTime maxDate)
@@ -44,7 +52,11 @@ namespace VostokZapadApp.Infrastructure.Data
             var sql = "SELECT * FROM Orders as O " +
                       "WHERE O.DocDate > @minDate AND O.DocDate < @maxDate";
 
-            return await _db.QueryAsync<Order>(sql, new {minDate, maxDate}) as List<Order> ?? throw new Exception("Empty result from db.");
+            var result = await _db.QueryAsync<Order>(sql, new {minDate, maxDate}) as List<Order> ?? new List<Order>();
+            if (result.Count < 1)
+                return new NotFoundResult();
+
+            return result;
         }
 
         public async Task<ActionResult<List<Order>>> GetByCustomerAsync(Customer customer)
@@ -57,7 +69,11 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@name", customer.Name);
 
-            return await _db.QueryAsync<Order>(sql) as List<Order> ?? throw new Exception("Empty result from db.");
+            var result = await _db.QueryAsync<Order>(sql) as List<Order> ?? new List<Order>();
+            if (result.Count < 1)
+                return new NotFoundResult();
+
+            return result;
         }
 
         public async Task<ActionResult> AddAsync(Order order)
