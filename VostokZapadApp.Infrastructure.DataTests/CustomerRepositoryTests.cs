@@ -43,7 +43,7 @@ namespace VostokZapadApp.Infrastructure.Data.Tests
         {
             var customer = new Customer {Name = "TestName"};
 
-            var result = await _rep.AddAsync(customer);
+            var result = await _rep.AddOrUpdateAsync(customer);
 
             Assert.AreEqual(typeof(OkResult), result.GetType());
         }

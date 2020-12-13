@@ -32,10 +32,11 @@ namespace VostokZapadApp.Infrastructure.Data
             return await _dbConnection.QueryFirstOrDefaultAsync<Customer>(sql, new {name});
         }
 
-        public async Task<ActionResult> AddAsync(Customer customer)
+        public async Task<ActionResult> AddOrUpdateAsync(Customer customer)
         {
             var sql = "INSERT INTO Customers (Name) " +
                       "VALUES (@name)";
+
 
             var parameters = new DynamicParameters();
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);

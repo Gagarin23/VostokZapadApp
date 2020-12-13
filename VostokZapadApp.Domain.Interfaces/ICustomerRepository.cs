@@ -12,7 +12,7 @@ namespace VostokZapadApp.Domain.Interfaces
     public interface ICustomerRepository
     {
         Task<ActionResult<Customer>> GetAsync(string customerName);
-        Task<ActionResult> AddAsync(Customer customer);
+        Task<ActionResult> AddOrUpdateAsync(Customer customer);
         Task<ActionResult> UpdateOrInsertAsync(Customer customer);
         Task<ActionResult> RemoveAsync(string customerName);
     }

@@ -23,12 +23,22 @@ namespace VostokZapadApp.Controllers
             _validateService = validateService;
         }
 
+        /// <summary>
+        /// Получить все заказы.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("/all")]
         public async Task<ActionResult<List<Sales>>> GetAll()
         {
             return await _salesService.GetAllAsync();
         }
 
+        /// <summary>
+        /// Получить заказы по дате.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
         [HttpGet("/bydate")]
         public async Task<ActionResult<List<Sales>>> GetByDate([FromHeader(Name = "Min-Date")]DateTime min, [FromHeader(Name = "Max-Date")]DateTime max)
         {
@@ -38,6 +48,11 @@ namespace VostokZapadApp.Controllers
             return await _salesService.GetByDateAsync(min, max);
         }
 
+        /// <summary>
+        /// Получить заказы по имени покупателя.
+        /// </summary>
+        /// <param name="customerName"></param>
+        /// <returns></returns>
         [HttpGet("/bycustomer")]
         public async Task<ActionResult<Sales>> GetByCustomer(string customerName)
         {
@@ -47,6 +62,11 @@ namespace VostokZapadApp.Controllers
             return await _salesService.GetByCustomerAsync(customerName);
         }
 
+        /// <summary>
+        /// Получить заказ по номеру документа(не id базы).
+        /// </summary>
+        /// <param name="documentId"></param>
+        /// <returns></returns>
         [HttpGet("/bydocid")]
         public async Task<ActionResult<Sales>> GetById(int documentId)
         {
@@ -56,6 +76,11 @@ namespace VostokZapadApp.Controllers
             return await _salesService.GetByDocIdAsync(documentId);
         }
 
+        /// <summary>
+        /// Добавить покупателя.
+        /// </summary>
+        /// <param name="customerName"></param>
+        /// <returns></returns>
         [HttpPost("/addcustomer")]
         public async Task<ActionResult> AddCustomer(string customerName)
         {
@@ -65,6 +90,14 @@ namespace VostokZapadApp.Controllers
             return await _validateService.AddCustomer(customerName);
         }
 
+        /// <summary>
+        /// Добавить заказ.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="documentId"></param>
+        /// <param name="sum"></param>
+        /// <param name="customerName"></param>
+        /// <returns></returns>
         [HttpPost("/addorder")]
         public async Task<ActionResult> AddOrder(DateTime date, int documentId, decimal sum, string customerName) //По хорошему тут должена быть своя абстракция на входные данные.
         {
