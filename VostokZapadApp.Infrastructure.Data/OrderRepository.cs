@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,13 +28,15 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<List<Order>>> GetAllAsync()
         {
-            var result = await _db.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure) 
-                as List<Order> ?? new List<Order>();
+            var reader = await _db.ExecuteReaderAsync(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure) 
+                             as DbDataReader ?? throw new Exception("Ошибка каста IDbDataReader в DbDataReader");
 
-            if(result.Count < 1)
+            var orders = GetOrders(reader);
+
+            if (orders.Count < 1)
                 return new NotFoundResult();
 
-            return result;
+            return orders;
         }
 
         public async Task<ActionResult<Order>> GetByDocIdAsync(int documentId)
@@ -41,13 +44,16 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@DocId", documentId, DbType.Int32, ParameterDirection.Input);
 
-            var result = await _db.QueryFirstOrDefaultAsync<Order>(
-                OrderProcedures.GetOrderByDocumentId, parameters, commandType: CommandType.StoredProcedure);
+            var reader = await _db.ExecuteReaderAsync(
+                OrderProcedures.GetOrderByDocumentId, parameters, commandType: CommandType.StoredProcedure) as DbDataReader ??
+                         throw new Exception("Ошибка каста IDbDataReader в DbDataReader");;
 
-            if(result == null)
+            var orders = GetOrders(reader).FirstOrDefault();
+
+            if (orders == null)
                 return new NotFoundResult();
 
-            return result;
+            return orders;
         }
 
         public async Task<ActionResult<List<Order>>> GetByDateAsync(DateTime minDate, DateTime maxDate)
@@ -56,14 +62,16 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@MinDate", minDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
             parameters.Add("@MaxDate", maxDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
 
-            var result = await _db.QueryAsync<Order>(
-                    OrderProcedures.GetOrdersByDate, parameters, commandType: CommandType.StoredProcedure) 
-                    as List<Order> ?? new List<Order>();
+            var reader = await _db.ExecuteReaderAsync(
+                OrderProcedures.GetOrdersByDate, parameters, commandType: CommandType.StoredProcedure) as DbDataReader ??
+                throw new Exception("Ошибка каста IDbDataReader в DbDataReader");
 
-            if (result.Count < 1)
+            var orders = GetOrders(reader);
+
+            if (orders.Count < 1)
                 return new NotFoundResult();
 
-            return result;
+            return orders;
         }
 
         public async Task<ActionResult<List<Order>>> GetByCustomerAsync(Customer customer)
@@ -71,14 +79,16 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@Name", customer.Name, DbType.String, ParameterDirection.Input);
 
-            var result = await _db.QueryAsync<Order>(
-                    OrderProcedures.GetOrdersByCustomer, parameters, commandType:CommandType.StoredProcedure) 
-                    as List<Order> ?? new List<Order>();
+            var reader = await _db.ExecuteReaderAsync(
+                    OrderProcedures.GetOrdersByCustomer, parameters, commandType:CommandType.StoredProcedure) as DbDataReader ??
+                         throw new Exception("Ошибка каста IDbDataReader в DbDataReader");
 
-            if (result.Count < 1)
+            var orders = GetOrders(reader);
+
+            if (orders.Count < 1)
                 return new NotFoundResult();
 
-            return result;
+            return orders;
         }
 
         public async Task<ActionResult> AddAsync(Order order)
@@ -101,7 +111,7 @@ namespace VostokZapadApp.Infrastructure.Data
         public async Task<ActionResult> UpdateOrInsertAsync(Order order) //todo: поменять этого монстра на обычный update 200 или 404
         {
             var sql = "MERGE " +
-                      "INTO Orders WITH (HOLDLOCK) AS target " +
+                      "INTO GetOrders WITH (HOLDLOCK) AS target " +
                       "USING (SELECT " +
                       "@docDate as docDate," +
                       "@docId as docId," +
@@ -135,6 +145,30 @@ namespace VostokZapadApp.Infrastructure.Data
         public async Task<ActionResult> RemoveAsync(int documentId)
         {
             throw new NotImplementedException();
+        }
+
+        private List<Order> GetOrders(DbDataReader reader)
+        {
+            var orders = new List<Order>();
+
+            while (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    orders.Add(new Order
+                    {
+                        Id = reader.GetInt32(0),
+                        DateTime = reader.GetDateTime(1),
+                        DocumentId = reader.GetInt32(2),
+                        OrderSum = reader.GetDecimal(3),
+                        CustomerId = reader.GetInt32(4)
+                    });
+                }
+
+                reader.NextResult();
+            }
+
+            return orders;
         }
     }
 }

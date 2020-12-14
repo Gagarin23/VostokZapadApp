@@ -35,7 +35,7 @@ namespace VostokZapadApp.Controllers
 
         //todo: разобраться почему не парсится дата.
         /// <summary>
-        /// Получить заказы по дате. NOTE: выборка работает корректно, но при получении данных DateTime парсится в default значение.
+        /// Получить заказы по дате.
         /// </summary>
         /// <param name="min">MM/dd/yyyy</param>
         /// <param name="max">MM/dd/yyyy</param>
