@@ -10,6 +10,6 @@ namespace VostokZapadApp.Services.Interfaces
     public interface ICustomersValidateService
     {
         Task<ActionResult> AddAsync(string customerName);
-        Task<ActionResult> UpdateOrInsertAsync(int id, string customerName);
+        Task<ActionResult> UpdateAsync(int id, string customerName);
     }
 }

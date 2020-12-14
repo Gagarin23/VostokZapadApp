@@ -13,7 +13,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
         public static readonly string GetOrdersByDate = "GetOrdersByDate";
         public static readonly string GetOrdersByCustomer = "GetOrdersByCustomer";
         public static readonly string AddOrder = "AddOrder";
-        public static readonly string UpdateOrInsertOrder = "UpdateOrInsertOrder";
+        public static readonly string UpdateOrder = "UpdateOrder";
         public static readonly string RemoveOrder = "RemoveOrder";
     }
 }

@@ -28,7 +28,7 @@ namespace VostokZapadApp.Infrastructure.Business
             return await _customerRepository.AddAsync(customer);
         }
 
-        public async Task<ActionResult> UpdateOrInsertAsync(int id, string customerName)
+        public async Task<ActionResult> UpdateAsync(int id, string customerName)
         {
             if(id < 1 || string.IsNullOrWhiteSpace(customerName))
                 return new BadRequestResult();
@@ -38,7 +38,7 @@ namespace VostokZapadApp.Infrastructure.Business
                 Id = id,
                 Name = customerName
             };
-            return await _customerRepository.UpdateOrInsertAsync(customer);
+            return await _customerRepository.UpdateAsync(customer);
         }
     }
 }

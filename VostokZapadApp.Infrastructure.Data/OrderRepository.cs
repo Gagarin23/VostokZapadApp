@@ -98,7 +98,7 @@ namespace VostokZapadApp.Infrastructure.Data
             return new StatusCodeResult(500);
         }
 
-        public async Task<ActionResult> UpdateOrInsertAsync(Order order)
+        public async Task<ActionResult> UpdateOrInsertAsync(Order order) //todo: поменять этого монстра на обычный update 200 или 404
         {
             var sql = "MERGE " +
                       "INTO Orders WITH (HOLDLOCK) AS target " +

@@ -72,13 +72,13 @@ namespace VostokZapadApp.Controllers
         /// <param name="id"></param>
         /// <param name="customerName"></param>
         /// <returns></returns>
-        [HttpPatch("/change/{id}")]
-        public async Task<ActionResult> Put(int id, string customerName)
+        [HttpPatch("/update/{id}")]
+        public async Task<ActionResult> Update(int id, string customerName)
         {
             if (id < 1 || string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
 
-            return await _validateService.UpdateOrInsertAsync(id, customerName);
+            return await _validateService.UpdateAsync(id, customerName);
         }
 
         /// <summary>

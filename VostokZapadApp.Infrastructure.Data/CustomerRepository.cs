@@ -56,21 +56,17 @@ namespace VostokZapadApp.Infrastructure.Data
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
 
-        public async Task<ActionResult> UpdateOrInsertAsync(Customer customer)
+        public async Task<ActionResult> UpdateAsync(Customer customer)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@id", customer.Id, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
+            parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            //проблема описана в DatabaseInitialisater.CreateCustomersProcedures()
-            //parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
+            await _dbConnection.ExecuteAsync(
+                CustomerProcedures.UpdateCustomer, parameters, commandType:CommandType.StoredProcedure);
 
-            var result = await _dbConnection.ExecuteAsync(
-                CustomerProcedures.UpdateOrInsertCustomer, parameters, commandType:CommandType.StoredProcedure);
-
-            return new OkResult();
-
-            //return new StatusCodeResult(parameters.Get<int>("@statusCode"));
+            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
 
         public async Task<ActionResult> RemoveAsync(int id)

@@ -91,26 +91,17 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                       "        RETURN 201 " +
                       "    END";
             
-            //выдает ошибку если включаю return:
-            //A MERGE statement must be terminated by a semi-colon (;).
-            //куда лепить ; так и не понял.
-            var updateOrInsert = $"CREATE PROCEDURE {CustomerProcedures.UpdateOrInsertCustomer}( " +
+            
+            var update = $"CREATE PROCEDURE {CustomerProcedures.UpdateCustomer}( " +
                                  "@Id INT, @Name NVARCHAR(50)) AS " +
-                                 //"BEGIN " +
-                                 "MERGE " +
-                                 "INTO Customers WITH (HOLDLOCK) AS target " +
-                                 "USING (SELECT @Id as id, @Name as name) as src (id, name) " +
-                                 "ON (target.Id = src.id) " +
-                                 "WHEN MATCHED " +
-                                 "   THEN UPDATE " +
-                                 "      SET target.Name = src.name " +
-                                 //"      RETURN 200 " +
-                                 "WHEN NOT MATCHED " +
-                                 "   THEN INSERT(name) " +
-                                 "      VALUES(src.name); ";
-                                 //"      RETURN 400 \r\n" +
-                                 //"; \r\n" +
-                                 //"END;"
+                                 "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Id = @Id) " +
+                                 "  BEGIN " +
+                                 "      UPDATE Customers SET Name = @Name " +
+                                 "      WHERE Id = @Id " +
+                                 "      RETURN 200 " +
+                                 "  END " +
+                                 "ELSE " +
+                                 "  RETURN 404";
 
             var removeByName = $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomerByName}( " +
                          "@Name NVARCHAR(50)) AS " +
@@ -137,7 +128,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 await db.ExecuteAsync(getByName);
                 await db.ExecuteAsync(getById);
                 await db.ExecuteAsync(add);
-                await db.ExecuteAsync(updateOrInsert);
+                await db.ExecuteAsync(update);
                 await db.ExecuteAsync(removeByName);
                 await db.ExecuteAsync(removeById);
             }
@@ -170,9 +161,9 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                       "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) " +
                       "VALUES (@DocDate, @DocId, @OrderSum, @CustomerId)";
 
-            var updateOrInsert = ""; //todo: доделать процедуры для заказов. Очень хочу спать...
+            var updateOrInsert = $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( "; //todo: доделать процедуры для заказов. Очень хочу спать...
 
-            var remove = "";
+            var remove = ""; 
 
             using (var db = new SqlConnection(_connectionString))
             {
