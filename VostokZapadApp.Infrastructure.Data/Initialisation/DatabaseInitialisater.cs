@@ -7,10 +7,10 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
 {
     public interface IDatabaseInitialiser
     {
-        void CreateDatabase();
-        void CreateTables();
-        void CreateCustomersProcedures();
-        void CreateOrdersProcedures();
+        Task CreateDatabase();
+        Task CreateTables();
+        Task CreateCustomersProcedures();
+        Task CreateOrdersProcedures();
     }
 
     public class DatabaseInitialiser : IDatabaseInitialiser
@@ -31,7 +31,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
             _connectionString = $"Server=(localdb)\\mssqllocaldb;Database={databaseName};Trusted_Connection=True;MultipleActiveResultSets=true";
         }
 
-        public void CreateDatabase()
+        public async Task CreateDatabase()
         {
             string query = $"CREATE DATABASE {_databaseName}";
 
@@ -39,13 +39,13 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
             {
                 using (var db = new SqlConnection(InitConnection))
                 {
-                    db.Execute(query);
+                    await db.ExecuteAsync(query);
                     _isDbCreated = true;
                 }
             }
         }
 
-        public void CreateTables()
+        public async Task CreateTables()
         {
             string queryShops = "CREATE TABLE Customers " +
                                 "(Id INT IDENTITY PRIMARY KEY, " +
@@ -62,14 +62,14 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
             {
                 using (var db = new SqlConnection(_connectionString))
                 {
-                    db.Execute(queryShops);
-                    db.Execute(queryProducts);
+                    await db.ExecuteAsync(queryShops);
+                    await db.ExecuteAsync(queryProducts);
                     _isTablesCreated = true;
                 }
             }
         }
 
-        public void CreateCustomersProcedures()
+        public async Task CreateCustomersProcedures()
         {
             var getByName = $"CREATE PROCEDURE {CustomerProcedures.GetCustomerByName}( " +
                             "@Name NVARCHAR(50)) AS " +
@@ -125,16 +125,16 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
 
             using (var db = new SqlConnection(_connectionString))
             {
-                db.Execute(getByName);
-                db.Execute(getById);
-                db.Execute(add);
-                db.Execute(update);
-                db.Execute(removeByName);
-                db.Execute(removeById);
+                await db.ExecuteAsync(getByName);
+                await db.ExecuteAsync(getById);
+                await db.ExecuteAsync(add);
+                await db.ExecuteAsync(update);
+                await db.ExecuteAsync(removeByName);
+                await db.ExecuteAsync(removeById);
             }
         }
 
-        public void CreateOrdersProcedures()
+        public async Task CreateOrdersProcedures()
         {
             var getAll = $"CREATE PROCEDURE {OrderProcedures.GetAllOrders} AS " +
                          "SELECT * FROM Orders";
@@ -167,11 +167,11 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
 
             using (var db = new SqlConnection(_connectionString))
             {
-                db.Execute(getAll);
-                db.Execute(getByDoc);
-                db.Execute(getByDate);
-                db.Execute(getByCustomer);
-                db.Execute(add);
+                await db.ExecuteAsync(getAll);
+                await db.ExecuteAsync(getByDoc);
+                await db.ExecuteAsync(getByDate);
+                await db.ExecuteAsync(getByCustomer);
+                await db.ExecuteAsync(add);
             }
         }
     }

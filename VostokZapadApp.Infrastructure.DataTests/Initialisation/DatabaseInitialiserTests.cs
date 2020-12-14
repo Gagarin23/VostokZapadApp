@@ -18,15 +18,15 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation.Tests
             _init = new DatabaseInitialiser("VostokZapadDb");
         }
         [Test()]
-        public async Task CreateCustomersProceduresTest()
+        public void CreateCustomersProceduresTest()
         {
-            await _init.CreateCustomersProcedures();
+            _init.CreateCustomersProcedures();
         }
 
         [Test()]
-        public async Task CreateOrdersProceduresTest()
+        public void CreateOrdersProceduresTest()
         {
-            await _init.CreateOrdersProcedures();
+            _init.CreateOrdersProcedures();
         }
     }
 }
