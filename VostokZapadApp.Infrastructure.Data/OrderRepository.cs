@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using VostokZapadApp.Domain.Core;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
+using VostokZapadApp.Infrastructure.Data.Initialisation;
 
 namespace VostokZapadApp.Infrastructure.Data
 {
@@ -26,9 +27,9 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<List<Order>>> GetAllAsync()
         {
-            var sql = "SELECT * FROM ORDERS";
+            var result = await _db.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure) 
+                as List<Order> ?? new List<Order>();
 
-            var result = await _db.QueryAsync<Order>(sql) as List<Order> ?? new List<Order>();
             if(result.Count < 1)
                 return new NotFoundResult();
 
@@ -37,10 +38,12 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<Order>> GetByDocIdAsync(int documentId)
         {
-            var sql = "SELECT TOP(1) * FROM ORDERS as O " +
-                      "WHERE O.DocumentId = @documentId";
+            var parameters = new DynamicParameters();
+            parameters.Add("@DocId", documentId, DbType.Int32, ParameterDirection.Input);
 
-            var result = await _db.QueryFirstOrDefaultAsync<Order>(sql, new{documentId});
+            var result = await _db.QueryFirstOrDefaultAsync<Order>(
+                OrderProcedures.GetOrderByDocumentId, parameters, commandType: CommandType.StoredProcedure);
+
             if(result == null)
                 return new NotFoundResult();
 
@@ -49,10 +52,14 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<List<Order>>> GetByDateAsync(DateTime minDate, DateTime maxDate)
         {
-            var sql = "SELECT * FROM Orders as O " +
-                      "WHERE O.DocDate > @minDate AND O.DocDate < @maxDate";
+            var parameters = new DynamicParameters();
+            parameters.Add("@MinDate", minDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
+            parameters.Add("@MaxDate", maxDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
 
-            var result = await _db.QueryAsync<Order>(sql, new {minDate, maxDate}) as List<Order> ?? new List<Order>();
+            var result = await _db.QueryAsync<Order>(
+                    OrderProcedures.GetOrdersByDate, parameters, commandType: CommandType.StoredProcedure) 
+                    as List<Order> ?? new List<Order>();
+
             if (result.Count < 1)
                 return new NotFoundResult();
 
@@ -61,15 +68,13 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<List<Order>>> GetByCustomerAsync(Customer customer)
         {
-            var sql = "SELECT * FROM ORDERS as O " +
-                      "WHERE O.CustomerId = (SELECT TOP(1) Id " +
-                      "FROM Customers as C " +
-                      "WHERE C.Name = @name)";
-
             var parameters = new DynamicParameters();
-            parameters.Add("@name", customer.Name);
+            parameters.Add("@Name", customer.Name, DbType.String, ParameterDirection.Input);
 
-            var result = await _db.QueryAsync<Order>(sql, parameters) as List<Order> ?? new List<Order>();
+            var result = await _db.QueryAsync<Order>(
+                    OrderProcedures.GetOrdersByCustomer, parameters, commandType:CommandType.StoredProcedure) 
+                    as List<Order> ?? new List<Order>();
+
             if (result.Count < 1)
                 return new NotFoundResult();
 
@@ -78,16 +83,15 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult> AddAsync(Order order)
         {
-            var sql = "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) " +
-                      "VALUES (@docDate, @docId, @orderSum, @customerId)";
-
             var parameters = new DynamicParameters();
-            parameters.Add("@docDate", order.DateTime, DbType.Date, ParameterDirection.Input);
-            parameters.Add("@docId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
-            parameters.Add("@orderSum", order.OrderSum, DbType.Decimal, ParameterDirection.Input);
-            parameters.Add("@customerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
+            parameters.Add("@DocDate", order.DateTime, DbType.Date, ParameterDirection.Input);
+            parameters.Add("@DocId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
+            parameters.Add("@OrderSum", order.OrderSum, DbType.Decimal, ParameterDirection.Input);
+            parameters.Add("@CustomerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
 
-            var result = await _db.ExecuteAsync(sql, parameters);
+            var result = await _db.ExecuteAsync(
+                OrderProcedures.AddOrder, parameters, commandType: CommandType.StoredProcedure);
+
             if(result > 0)
                 return new StatusCodeResult(201);
 
@@ -127,6 +131,7 @@ namespace VostokZapadApp.Infrastructure.Data
             return new StatusCodeResult(500);
         }
 
+        //todo: доделать удаление заказа если успею.
         public async Task<ActionResult> RemoveAsync(int documentId)
         {
             throw new NotImplementedException();

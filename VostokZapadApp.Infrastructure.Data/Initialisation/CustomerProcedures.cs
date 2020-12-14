@@ -15,6 +15,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
         public static readonly string GetCustomerById = "GetCustomerById";
         public static readonly string AddCustomer = "AddCustomer";
         public static readonly string UpdateOrInsertCustomer = "UpdateOrInsertCustomer";
-        public static readonly string RemoveCustomer = "RemoveCustomer";
+        public static readonly string RemoveCustomerByName = "RemoveCustomerByName";
+        public static readonly string RemoveCustomerById = "RemoveCustomerById";
     }
 }

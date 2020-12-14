@@ -33,8 +33,9 @@ namespace VostokZapadApp.Controllers
             return await _salesService.GetAllAsync();
         }
 
+        //todo: разобраться почему не парсится дата.
         /// <summary>
-        /// Получить заказы по дате.
+        /// Получить заказы по дате. NOTE: выборка работает корректно, но при получении данных DateTime парсится в default значение.
         /// </summary>
         /// <param name="min">MM/dd/yyyy</param>
         /// <param name="max">MM/dd/yyyy</param>

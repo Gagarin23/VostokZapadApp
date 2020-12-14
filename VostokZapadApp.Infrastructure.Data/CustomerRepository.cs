@@ -13,9 +13,6 @@ using VostokZapadApp.Infrastructure.Data.Initialisation;
 
 namespace VostokZapadApp.Infrastructure.Data
 {
-    /// <summary>
-    ///     По хорошему, я считаю нужно подтягивать хранимые процедуры, а не хардкодить строками.
-    /// </summary>
     public class CustomerRepository : ICustomerRepository
     {
         private readonly IDbConnection _dbConnection;
@@ -64,14 +61,14 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@id", customer.Id, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
+
             //проблема описана в DatabaseInitialisater.CreateCustomersProcedures()
             //parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            var result = await _dbConnection.ExecuteAsync(CustomerProcedures.UpdateOrInsertCustomer, parameters);
-            if(result > 1)
-                return new OkResult();
+            var result = await _dbConnection.ExecuteAsync(
+                CustomerProcedures.UpdateOrInsertCustomer, parameters, commandType:CommandType.StoredProcedure);
 
-            return new BadRequestResult();
+            return new OkResult();
 
             //return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
@@ -79,11 +76,10 @@ namespace VostokZapadApp.Infrastructure.Data
         public async Task<ActionResult> RemoveAsync(int id)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@name", string.Empty, DbType.String, ParameterDirection.Input);
             parameters.Add("@id", id, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomer, parameters, commandType: CommandType.StoredProcedure);
+            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerById, parameters, commandType: CommandType.StoredProcedure);
 
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
@@ -92,10 +88,9 @@ namespace VostokZapadApp.Infrastructure.Data
         {
             var parameters = new DynamicParameters();
             parameters.Add("@name", customerName, DbType.String, ParameterDirection.Input);
-            parameters.Add("@id", 0, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomer, parameters, commandType: CommandType.StoredProcedure);
+            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerByName, parameters, commandType: CommandType.StoredProcedure);
 
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }

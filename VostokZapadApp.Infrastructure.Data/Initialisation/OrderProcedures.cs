@@ -8,5 +8,12 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
 {
     class OrderProcedures
     {
+        public static readonly string GetAllOrders = "GetAllOrders";
+        public static readonly string GetOrderByDocumentId = "GetOrderByDocumentId";
+        public static readonly string GetOrdersByDate = "GetOrdersByDate";
+        public static readonly string GetOrdersByCustomer = "GetOrdersByCustomer";
+        public static readonly string AddOrder = "AddOrder";
+        public static readonly string UpdateOrInsertOrder = "UpdateOrInsertOrder";
+        public static readonly string RemoveOrder = "RemoveOrder";
     }
 }

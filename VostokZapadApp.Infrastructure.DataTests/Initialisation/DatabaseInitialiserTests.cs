@@ -11,11 +11,22 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation.Tests
     [TestFixture()]
     public class DatabaseInitialiserTests
     {
+        private DatabaseInitialiser _init;
+        [SetUp]
+        public void Init()
+        {
+            _init = new DatabaseInitialiser("VostokZapadDb");
+        }
         [Test()]
         public async Task CreateCustomersProceduresTest()
         {
-            var init = new DatabaseInitialiser("VostokZapadDb");
-            await init.CreateCustomersProcedures();
+            await _init.CreateCustomersProcedures();
+        }
+
+        [Test()]
+        public async Task CreateOrdersProceduresTest()
+        {
+            await _init.CreateOrdersProcedures();
         }
     }
 }

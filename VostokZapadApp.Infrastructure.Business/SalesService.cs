@@ -56,6 +56,9 @@ namespace VostokZapadApp.Infrastructure.Business
         {
             var customer = new Customer{Name = customerName};
             var orders = await _orderRepository.GetByCustomerAsync(customer);
+            if (orders.Value == null)
+                return new NotFoundResult();
+
             customer.Id = orders.Value.First().CustomerId;
             return new Sales
             {
@@ -67,6 +70,9 @@ namespace VostokZapadApp.Infrastructure.Business
         public async Task<ActionResult<Sales>> GetByDocIdAsync(int documentId)
         {
             var order = await _orderRepository.GetByDocIdAsync(documentId);
+            if (order.Value == null)
+                return new NotFoundResult();
+
             return new Sales
             {
                 Customer = (await _customerRepository.GetAsync(order.Value.CustomerId)).Value,

@@ -73,7 +73,7 @@ namespace VostokZapadApp.Controllers
         /// <param name="customerName"></param>
         /// <returns></returns>
         [HttpPatch("/change/{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] string customerName)
+        public async Task<ActionResult> Put(int id, string customerName)
         {
             if (id < 1 || string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
@@ -100,7 +100,7 @@ namespace VostokZapadApp.Controllers
         /// </summary>
         /// <param name="customerName"></param>
         /// <returns></returns>
-        [HttpDelete("/del/{customerName}")]
+        [HttpDelete("/del/name={customerName}")]
         public async Task<ActionResult> Delete(string customerName)
         {
             return await _customerRepository.RemoveAsync(customerName);
