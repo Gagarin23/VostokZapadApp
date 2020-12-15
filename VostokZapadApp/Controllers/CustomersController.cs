@@ -27,7 +27,7 @@ namespace VostokZapadApp.Controllers
         /// <summary>
         /// Получить клиента по имени.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param customerName="customerName"></param>
         /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<Customer>> Get(string customerName)
@@ -41,7 +41,7 @@ namespace VostokZapadApp.Controllers
         /// <summary>
         /// Получить клиента по id.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param id="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> Get(int id)
@@ -55,10 +55,10 @@ namespace VostokZapadApp.Controllers
         /// <summary>
         /// Добавить клиента.
         /// </summary>
-        /// <param name="customerName"></param>
-        /// <returns></returns>
+        /// <param customerName="customerName"></param>
+        /// <returns>Id клиента.</returns>
         [HttpPost("/add")]
-        public async Task<ActionResult> AddCustomer(string customerName)
+        public async Task<ActionResult<int>> AddCustomer(string customerName)
         {
             if (string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
@@ -103,6 +103,9 @@ namespace VostokZapadApp.Controllers
         [HttpDelete("/del/name={customerName}")]
         public async Task<ActionResult> Delete(string customerName)
         {
+            if (string.IsNullOrWhiteSpace(customerName))
+                return BadRequest();
+            
             return await _customerRepository.RemoveAsync(customerName);
         }
     }

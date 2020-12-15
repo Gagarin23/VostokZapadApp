@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VostokZapadApp.Infrastructure.Data.Initialisation
 {
-    class OrderProcedures
+    public class OrderProcedures
     {
         public static readonly string GetAllOrders = "GetAllOrders";
         public static readonly string GetOrderByDocumentId = "GetOrderByDocumentId";

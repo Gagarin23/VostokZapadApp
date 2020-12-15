@@ -44,16 +44,16 @@ namespace VostokZapadApp.Infrastructure.Data
             return new NotFoundResult();
         }
 
-        public async Task<ActionResult> AddAsync(Customer customer)
+        public async Task<ActionResult<int>> AddAsync(Customer customer)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(CustomerProcedures.AddCustomer, parameters,
+            var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(CustomerProcedures.AddCustomer, parameters,
                 commandType: CommandType.StoredProcedure);
 
-            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
+            return new ObjectResult(id) {StatusCode = parameters.Get<int>("@statusCode")};
         }
 
         public async Task<ActionResult> UpdateAsync(Customer customer)

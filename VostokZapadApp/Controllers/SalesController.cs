@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VostokZapadApp.Domain.Core;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Core.InputOutputData;
+using VostokZapadApp.Domain.Interfaces;
 using VostokZapadApp.Services.Interfaces;
 
 namespace VostokZapadApp.Controllers
@@ -16,11 +17,13 @@ namespace VostokZapadApp.Controllers
     {
         private readonly ISalesService _salesService;
         private readonly IOrdersValidateService _ordersValidateService;
+        private readonly IOrderRepository _orderRepository;
 
-        public SalesController(ISalesService salesService, IOrdersValidateService ordersValidateService)
+        public SalesController(ISalesService salesService, IOrdersValidateService ordersValidateService, IOrderRepository orderRepository)
         {
             _salesService = salesService;
             _ordersValidateService = ordersValidateService;
+            _orderRepository = orderRepository;
         }
 
         /// <summary>
@@ -32,8 +35,7 @@ namespace VostokZapadApp.Controllers
         {
             return await _salesService.GetAllAsync();
         }
-
-        //todo: разобраться почему не парсится дата.
+        
         /// <summary>
         /// Получить заказы по дате.
         /// </summary>
@@ -92,6 +94,20 @@ namespace VostokZapadApp.Controllers
                 return BadRequest();
 
             return await _ordersValidateService.AddOrderAsync(date, documentId, sum, customerName);
+        }
+        
+        /// <summary>
+        /// Удалить заказ по номеру документа.
+        /// </summary>
+        /// <param name="documentId"></param>
+        /// <returns></returns>
+        [HttpDelete("/del/documentId={documentId}")]
+        public async Task<ActionResult> Delete(int documentId)
+        {
+            if (documentId == 0)
+                return BadRequest();
+            
+            return await _orderRepository.RemoveAsync(documentId);
         }
     }
 }

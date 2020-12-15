@@ -23,25 +23,18 @@ namespace VostokZapadApp.Infrastructure.Business
 
         public async Task<ActionResult> AddOrderAsync(DateTime date, int documentId, decimal sum, string customerName)
         {
-            #region КостыльЗаКоторыйМнеСтыдно //todo: если будет время, делегировать и оптимизировать в запросе sql
-
-            var customer = (await _customerRepository.GetAsync(customerName)).Value;
-            if (customer == null)
-            {
-                await _customerRepository.AddAsync(new Customer{Name = customerName});
-                customer = (await _customerRepository.GetAsync(customerName)).Value;
-            }
-
-            #endregion
+            var id = (await _customerRepository.GetAsync(customerName)).Value.Id;
+            if (id == 0)
+                return new ObjectResult("Клиент не найден.") {StatusCode = 404};
 
             //...еще какая-то валидация.
 
             var order = new Order
             {
-                DateTime = date,
+                DocDate = date,
                 DocumentId = documentId,
                 OrderSum = sum,
-                CustomerId = customer.Id
+                CustomerId = id
             };
 
             return await _orderRepository.AddAsync(order);

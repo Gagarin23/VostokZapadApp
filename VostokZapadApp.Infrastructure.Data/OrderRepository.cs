@@ -19,19 +19,17 @@ namespace VostokZapadApp.Infrastructure.Data
     /// </summary>
     public class OrderRepository : IOrderRepository
     {
-        private readonly IDbConnection _db;
+        private readonly IDbConnection _dbConnection;
 
-        public OrderRepository(IDbConnection db)
+        public OrderRepository(IDbConnection dbConnection)
         {
-            _db = db;
+            _dbConnection = dbConnection;
         }
 
         public async Task<ActionResult<List<Order>>> GetAllAsync()
         {
-            var reader = await _db.ExecuteReaderAsync(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure) 
-                             as DbDataReader ?? throw new Exception("Ошибка каста IDbDataReader в DbDataReader");
-
-            var orders = GetOrders(reader);
+            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure) 
+                             as List<Order> ?? new List<Order>();
 
             if (orders.Count < 1)
                 return new NotFoundResult();
@@ -44,11 +42,8 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@DocId", documentId, DbType.Int32, ParameterDirection.Input);
 
-            var reader = await _db.ExecuteReaderAsync(
-                OrderProcedures.GetOrderByDocumentId, parameters, commandType: CommandType.StoredProcedure) as DbDataReader ??
-                         throw new Exception("Ошибка каста IDbDataReader в DbDataReader");;
-
-            var orders = GetOrders(reader).FirstOrDefault();
+            var orders = await _dbConnection.QueryFirstAsync<Order>(OrderProcedures.GetAllOrders,
+                commandType: CommandType.StoredProcedure);
 
             if (orders == null)
                 return new NotFoundResult();
@@ -61,12 +56,9 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@MinDate", minDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
             parameters.Add("@MaxDate", maxDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
-
-            var reader = await _db.ExecuteReaderAsync(
-                OrderProcedures.GetOrdersByDate, parameters, commandType: CommandType.StoredProcedure) as DbDataReader ??
-                throw new Exception("Ошибка каста IDbDataReader в DbDataReader");
-
-            var orders = GetOrders(reader);
+            
+            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure) 
+                as List<Order> ?? new List<Order>();
 
             if (orders.Count < 1)
                 return new NotFoundResult();
@@ -78,12 +70,9 @@ namespace VostokZapadApp.Infrastructure.Data
         {
             var parameters = new DynamicParameters();
             parameters.Add("@Name", customer.Name, DbType.String, ParameterDirection.Input);
-
-            var reader = await _db.ExecuteReaderAsync(
-                    OrderProcedures.GetOrdersByCustomer, parameters, commandType:CommandType.StoredProcedure) as DbDataReader ??
-                         throw new Exception("Ошибка каста IDbDataReader в DbDataReader");
-
-            var orders = GetOrders(reader);
+            
+            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure) 
+                as List<Order> ?? new List<Order>();
 
             if (orders.Count < 1)
                 return new NotFoundResult();
@@ -94,12 +83,12 @@ namespace VostokZapadApp.Infrastructure.Data
         public async Task<ActionResult> AddAsync(Order order)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("@DocDate", order.DateTime, DbType.Date, ParameterDirection.Input);
+            parameters.Add("@DocDate", order.DocDate, DbType.Date, ParameterDirection.Input);
             parameters.Add("@DocId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@OrderSum", order.OrderSum, DbType.Decimal, ParameterDirection.Input);
             parameters.Add("@CustomerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
 
-            var result = await _db.ExecuteAsync(
+            var result = await _dbConnection.ExecuteAsync(
                 OrderProcedures.AddOrder, parameters, commandType: CommandType.StoredProcedure);
 
             if(result > 0)
@@ -108,67 +97,29 @@ namespace VostokZapadApp.Infrastructure.Data
             return new StatusCodeResult(500);
         }
 
-        public async Task<ActionResult> UpdateOrInsertAsync(Order order) //todo: поменять этого монстра на обычный update 200 или 404
+        public async Task<ActionResult> UpdateOrInsertAsync(Order order)
         {
-            var sql = "MERGE " +
-                      "INTO GetOrders WITH (HOLDLOCK) AS target " +
-                      "USING (SELECT " +
-                      "@docDate as docDate," +
-                      "@docId as docId," +
-                      "@orderSum as orderSum," +
-                      "@customerId as customerId) as src (docDate, docId, orderSum, customerId) " +
-                      "ON (target.DocumentId = src.docId) " +
-                      "WHEN MATCHED " +
-                      "   THEN UPDATE " +
-                      "       SET target.DocDate = src.docDate, " +
-                      "         target.DocId = src.docId, " +
-                      "         target.OrderSum = src.orderSum," +
-                      "         target.CustomerId = src.customerId" +
-                      "WHEN NOT MATCHED " +
-                      "   THEN INSERT(docDate, docId, orderSum, customerId) " +
-                      "       VALUES(src.docDate, src.docId, src.orderSum, src.customerId);";
-
             var parameters = new DynamicParameters();
-            parameters.Add("@docDate", order.DateTime, DbType.Date, ParameterDirection.Input);
+            parameters.Add("@docDate", order.DocDate, DbType.Date, ParameterDirection.Input);
             parameters.Add("@docId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@orderSum", order.OrderSum, DbType.Decimal, ParameterDirection.Input);
             parameters.Add("@customerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
+            parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            var result = await _db.ExecuteAsync(sql, parameters);
-            if(result > 1)
-                return new OkResult();
-
-            return new StatusCodeResult(500);
+            var result = await _dbConnection.ExecuteAsync(OrderProcedures.UpdateOrder, parameters, commandType:CommandType.StoredProcedure);
+            
+            return new StatusCodeResult(result);
         }
-
-        //todo: доделать удаление заказа если успею.
+        
         public async Task<ActionResult> RemoveAsync(int documentId)
         {
-            throw new NotImplementedException();
-        }
+            var parameters = new DynamicParameters();
+            parameters.Add("@documentId", documentId, DbType.String, ParameterDirection.Input);
+            parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-        private List<Order> GetOrders(DbDataReader reader)
-        {
-            var orders = new List<Order>();
+            await _dbConnection.ExecuteAsync(OrderProcedures.RemoveOrder, parameters, commandType: CommandType.StoredProcedure);
 
-            while (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    orders.Add(new Order
-                    {
-                        Id = reader.GetInt32(0),
-                        DateTime = reader.GetDateTime(1),
-                        DocumentId = reader.GetInt32(2),
-                        OrderSum = reader.GetDecimal(3),
-                        CustomerId = reader.GetInt32(4)
-                    });
-                }
-
-                reader.NextResult();
-            }
-
-            return orders;
+            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
     }
 }

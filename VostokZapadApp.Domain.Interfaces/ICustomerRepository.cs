@@ -13,7 +13,7 @@ namespace VostokZapadApp.Domain.Interfaces
     {
         Task<ActionResult<Customer>> GetAsync(string customerName);
         Task<ActionResult<Customer>> GetAsync(int id);
-        Task<ActionResult> AddAsync(Customer customer);
+        Task<ActionResult<int>> AddAsync(Customer customer);
         Task<ActionResult> UpdateAsync(Customer customer);
         Task<ActionResult> RemoveAsync(int id);
         Task<ActionResult> RemoveAsync(string customerName);

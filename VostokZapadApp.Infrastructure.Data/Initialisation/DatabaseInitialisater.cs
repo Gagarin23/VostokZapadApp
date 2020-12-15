@@ -87,8 +87,10 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                       "    RETURN 400 " +
                       "ELSE " +
                       "    BEGIN " +
-                      "        INSERT INTO Customers (Name) VALUES (@Name) " +
-                      "        RETURN 201 " +
+                      "         INSERT INTO Customers (Name) " +
+                      "         OUTPUT INSERTED.Id" +
+                      "         VALUES (@Name) " +
+                      "         RETURN 201 " +
                       "    END";
             
             
@@ -161,9 +163,27 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                       "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) " +
                       "VALUES (@DocDate, @DocId, @OrderSum, @CustomerId)";
 
-            var updateOrInsert = $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( "; //todo: доделать процедуры для заказов. Очень хочу спать...
+            var update = $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( " +
+                         "@DocDate DATE, @DocumentId INT, @OrderSum MONEY, @CustomerId INT) AS " +
+                         "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE Id = @Id OR DocumentId = @DocumentId) " +
+                         "  BEGIN " +
+                         "      UPDATE Orders " +
+                         "      SET DocDate = @DocDate, OrderSum = @OrderSum, CustomerId = @CustomerId " +
+                         "      WHERE Id = @Id OR DocumentId = @DocumentId" +
+                         "      RETURN 200 " +
+                         "  END " +
+                         "ELSE " +
+                         "  RETURN 404";
 
-            var remove = ""; 
+            var removeById = $"CREATE PROCEDURE {OrderProcedures.RemoveOrder}( " +
+                             "@DocumentId INT) AS " +
+                             "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) " +
+                             "  BEGIN " +
+                             "      DELETE FROM Orders WHERE DocumentId = @DocumentId " +
+                             "      return 200 " +
+                             "  END " +
+                             "ELSE " +
+                             "  return 404";
 
             using (var db = new SqlConnection(_connectionString))
             {

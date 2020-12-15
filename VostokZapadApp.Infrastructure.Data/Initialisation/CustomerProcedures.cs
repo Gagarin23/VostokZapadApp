@@ -11,7 +11,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
     /// </summary>
     class CustomerProcedures
     {
-        public static readonly string GetCustomerByName = "GetCustomerByName";
+        public static readonly string GetCustomerByName = "#GetCustomerByName";
         public static readonly string GetCustomerById = "GetCustomerById";
         public static readonly string AddCustomer = "AddCustomer";
         public static readonly string UpdateCustomer = "UpdateCustomer";

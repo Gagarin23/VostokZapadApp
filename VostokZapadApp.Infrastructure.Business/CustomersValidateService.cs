@@ -19,7 +19,7 @@ namespace VostokZapadApp.Infrastructure.Business
             _customerRepository = customerRepository;
         }
 
-        public async Task<ActionResult> AddAsync(string customerName)
+        public async Task<ActionResult<int>> AddAsync(string customerName)
         {
             if(string.IsNullOrWhiteSpace(customerName))
                 return new BadRequestResult();

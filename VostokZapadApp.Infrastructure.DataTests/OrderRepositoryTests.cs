@@ -26,12 +26,17 @@ namespace VostokZapadApp.Infrastructure.Data.Tests
             var parameters = new DynamicParameters();
             parameters.Add("@MinDate", minDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
             parameters.Add("@MaxDate", maxDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
-            //parameters.Add("@dt", dbType: DbType.Date, direction: ParameterDirection.Output);
+            parameters.Add("@dt", dbType: DbType.Date, direction: ParameterDirection.Output);
 
+            var getByDate = $"CREATE PROCEDURE {OrderProcedures.GetOrdersByDate}( " +
+                            "@MinDate DATE, @MaxDate DATE) AS " +
+                            "SELECT * FROM Orders " +
+                            "WHERE DocDate > @MinDate AND DocDate < @MaxDate";
+            
             using (var db = new SqlConnection("Server=(localdb)\\mssqllocaldb;Database=VostokZapadDb;Trusted_Connection=True;MultipleActiveResultSets=true"))
             {
                 var reader = await db.ExecuteReaderAsync(
-                    "GetOrdersByDate", parameters, commandType: CommandType.StoredProcedure);
+                    "GetOrdersByDate", parameters);
 
                 while (reader.HasRows)
                 {

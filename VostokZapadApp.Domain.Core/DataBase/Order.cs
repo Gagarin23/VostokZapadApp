@@ -7,8 +7,8 @@ namespace VostokZapadApp.Domain.Core.DataBase
     {
         [Key]
         public int Id { get; set; }
-        public DateTime DateTime { get; set; }
-        public int DocumentId { get; set; } 
+        public DateTime DocDate { get; set; }
+        public int DocumentId { get; set; } //todo: надо было делать строкой. UPD Ну или добавить столбец и сделать составной ключ.
         public decimal OrderSum { get; set; }
         public int CustomerId { get; set; }
     }
