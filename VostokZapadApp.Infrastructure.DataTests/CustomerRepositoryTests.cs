@@ -1,11 +1,6 @@
-﻿using NUnit.Framework;
-using VostokZapadApp.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Data.SqlClient;
+using NUnit.Framework;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 
 namespace VostokZapadApp.Infrastructure.Data.Tests
 {

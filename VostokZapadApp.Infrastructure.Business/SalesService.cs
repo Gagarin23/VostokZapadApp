@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using VostokZapadApp.Domain.Core;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Core.InputOutputData;
 using VostokZapadApp.Domain.Interfaces;
@@ -54,7 +52,7 @@ namespace VostokZapadApp.Infrastructure.Business
 
         public async Task<ActionResult<Sales>> GetByCustomerAsync(string customerName)
         {
-            var customer = new Customer{Name = customerName};
+            var customer = new Customer { Name = customerName };
             var orders = await _orderRepository.GetByCustomerAsync(customer);
             if (orders.Value == null)
                 return new NotFoundResult();
@@ -76,7 +74,7 @@ namespace VostokZapadApp.Infrastructure.Business
             return new Sales
             {
                 Customer = (await _customerRepository.GetAsync(order.Value.CustomerId)).Value,
-                Orders = new List<Order> {order.Value}
+                Orders = new List<Order> { order.Value }
             };
         }
     }

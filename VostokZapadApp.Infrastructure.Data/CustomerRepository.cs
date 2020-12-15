@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
-using VostokZapadApp.Domain.Core;
+using System.Data;
+using System.Threading.Tasks;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
 using VostokZapadApp.Infrastructure.Data.Initialisation;
@@ -24,7 +19,7 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<Customer>> GetAsync(string name)
         {
-            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerByName, new {name}, 
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerByName, new { name },
                 commandType: CommandType.StoredProcedure);
 
             if (result != null)
@@ -35,7 +30,7 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<Customer>> GetAsync(int id)
         {
-            var result =  await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerById, new {id},
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerById, new { id },
                 commandType: CommandType.StoredProcedure);
 
             if (result != null)
@@ -53,7 +48,7 @@ namespace VostokZapadApp.Infrastructure.Data
             var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(CustomerProcedures.AddCustomer, parameters,
                 commandType: CommandType.StoredProcedure);
 
-            return new ObjectResult(id) {StatusCode = parameters.Get<int>("@statusCode")};
+            return new ObjectResult(id) { StatusCode = parameters.Get<int>("@statusCode") };
         }
 
         public async Task<ActionResult> UpdateAsync(Customer customer)
@@ -64,7 +59,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
             await _dbConnection.ExecuteAsync(
-                CustomerProcedures.UpdateCustomer, parameters, commandType:CommandType.StoredProcedure);
+                CustomerProcedures.UpdateCustomer, parameters, commandType: CommandType.StoredProcedure);
 
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }

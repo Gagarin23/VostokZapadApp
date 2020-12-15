@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using VostokZapadApp.Domain.Core;
-using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Core.InputOutputData;
 using VostokZapadApp.Domain.Interfaces;
 using VostokZapadApp.Services.Interfaces;
@@ -35,7 +32,7 @@ namespace VostokZapadApp.Controllers
         {
             return await _salesService.GetAllAsync();
         }
-        
+
         /// <summary>
         /// Получить заказы по дате.
         /// </summary>
@@ -43,7 +40,7 @@ namespace VostokZapadApp.Controllers
         /// <param name="max">MM/dd/yyyy</param>
         /// <returns></returns>
         [HttpGet("/bydate")]
-        public async Task<ActionResult<List<Sales>>> GetByDate([FromHeader(Name = "Min-Date")]DateTime min, [FromHeader(Name = "Max-Date")]DateTime max)
+        public async Task<ActionResult<List<Sales>>> GetByDate([FromHeader(Name = "Min-Date")] DateTime min, [FromHeader(Name = "Max-Date")] DateTime max)
         {
             if (min > max)
                 return BadRequest();
@@ -95,7 +92,7 @@ namespace VostokZapadApp.Controllers
 
             return await _ordersValidateService.AddOrderAsync(date, documentId, sum, customerName);
         }
-        
+
         /// <summary>
         /// Удалить заказ по номеру документа.
         /// </summary>
@@ -106,7 +103,7 @@ namespace VostokZapadApp.Controllers
         {
             if (documentId == 0)
                 return BadRequest();
-            
+
             return await _orderRepository.RemoveAsync(documentId);
         }
     }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
 using VostokZapadApp.Services.Interfaces;
@@ -21,16 +17,16 @@ namespace VostokZapadApp.Infrastructure.Business
 
         public async Task<ActionResult<int>> AddAsync(string customerName)
         {
-            if(string.IsNullOrWhiteSpace(customerName))
+            if (string.IsNullOrWhiteSpace(customerName))
                 return new BadRequestResult();
 
-            var customer = new Customer{Name = customerName};
+            var customer = new Customer { Name = customerName };
             return await _customerRepository.AddAsync(customer);
         }
 
         public async Task<ActionResult> UpdateAsync(int id, string customerName)
         {
-            if(id < 1 || string.IsNullOrWhiteSpace(customerName))
+            if (id < 1 || string.IsNullOrWhiteSpace(customerName))
                 return new BadRequestResult();
 
             var customer = new Customer

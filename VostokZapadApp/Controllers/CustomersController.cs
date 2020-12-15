@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
@@ -105,7 +102,7 @@ namespace VostokZapadApp.Controllers
         {
             if (string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
-            
+
             return await _customerRepository.RemoveAsync(customerName);
         }
     }

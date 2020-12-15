@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VostokZapadApp.Infrastructure.Data.Initialisation
 {
@@ -37,7 +36,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
         {
             string query = $"CREATE DATABASE {_databaseName}";
 
-            if(!_isDbCreated)
+            if (!_isDbCreated)
             {
                 using (var db = new SqlConnection(InitConnection))
                 {
@@ -54,7 +53,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "CREATE TABLE Customers " +
                 "(Id INT IDENTITY PRIMARY KEY, " +
                 "Name NVARCHAR(50) UNIQUE)",
-                
+
                 "CREATE TABLE Orders " +
                 "(Id INT IDENTITY PRIMARY KEY, " +
                 "DocDate date NOT NULL, " +
@@ -63,7 +62,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "CustomerId INT NOT NULL REFERENCES Customers(Id) ON DELETE CASCADE)"
             };
 
-            if(!_isTablesCreated)
+            if (!_isTablesCreated)
             {
                 using (var db = new SqlConnection(_connectionString))
                 {
@@ -78,7 +77,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                             Console.WriteLine(e.Message); //+ логгирование.
                         }
                     }
-                    
+
                     _isTablesCreated = true;
                 }
             }
@@ -92,12 +91,12 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "@Name NVARCHAR(50)) AS \r\n" +
                 "SELECT TOP(1) Id, Name FROM Customers \r\n" +
                 "WHERE Name = @Name ",
-                
+
                 $"CREATE PROCEDURE {CustomerProcedures.GetCustomerById}( \r\n" +
                 "@Id INT) AS \r\n" +
                 "SELECT TOP(1) Id, Name FROM Customers \r\n" +
                 "WHERE Id = @Id",
-                
+
                 $"CREATE PROCEDURE {CustomerProcedures.AddCustomer}( \r\n" +
                 "@Name NVARCHAR(50)) AS \r\n" +
                 "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Name = @Name) \r\n" +
@@ -109,7 +108,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "         VALUES (@Name) \r\n" +
                 "         RETURN 201 \r\n" +
                 "    END",
-                
+
                 $"CREATE PROCEDURE {CustomerProcedures.UpdateCustomer}( \r\n" +
                 "@Id INT, @Name NVARCHAR(50)) AS \r\n" +
                 "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Id = @Id) \r\n" +
@@ -120,7 +119,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "  END \r\n" +
                 "ELSE \r\n" +
                 "  RETURN 404",
-                
+
                 $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomerByName}( \r\n" +
                 "@Name NVARCHAR(50)) AS \r\n" +
                 "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Name = @Name) \r\n" +
@@ -130,7 +129,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "  END \r\n" +
                 "ELSE \r\n" +
                 "  return 404",
-                
+
                 $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomerById}( \r\n" +
                 "@Id INT) AS \r\n" +
                 "IF EXISTS (SELECT TOP(1) Id FROM Customers WHERE Id = @Id) \r\n" +
@@ -146,13 +145,13 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
             {
                 foreach (var procedure in procedures)
                 {
-                    try 
+                    try
                     {
                         db.Execute(procedure);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message); 
+                        Console.WriteLine(e.Message);
                     }
                 }
             }
@@ -164,23 +163,23 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
             {
                 $"CREATE PROCEDURE {OrderProcedures.GetAllOrders} AS \r\n" +
                 "SELECT * FROM Orders",
-                
+
                 $"CREATE PROCEDURE {OrderProcedures.GetOrderByDocumentId}( \r\n" +
                 "@DocId INT) AS \r\n" +
                 "SELECT TOP(1) * FROM ORDERS WHERE DocumentId = @DocId",
-                
+
                 $"CREATE PROCEDURE {OrderProcedures.GetOrdersByDate}( \r\n" +
                 "@MinDate DATE, @MaxDate DATE) AS \r\n" +
                 "SELECT * FROM Orders \r\n" +
                 "WHERE DocDate > @MinDate AND DocDate < @MaxDate",
-                
+
                 $"CREATE PROCEDURE {OrderProcedures.GetOrdersByCustomer}( \r\n" +
                 "@Name NVARCHAR(50)) AS \r\n" +
                 "SELECT * FROM Orders as O \r\n" +
                 "WHERE O.CustomerId = (SELECT TOP(1) Id \r\n" +
                 "FROM Customers as C \r\n" +
                 "WHERE C.Name = @Name)",
-                
+
                 $"CREATE PROCEDURE {OrderProcedures.AddOrder}( \r\n" +
                 "@DocDate DATE, @DocId INT, @OrderSum MONEY, @CustomerId INT) AS \r\n" +
                 "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocId) \r\n" +
@@ -192,7 +191,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "   END \r\n" +
                 "ELSE \r\n" +
                 "   RETURN 400",
-                
+
                 $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( \r\n" +
                 "@DocDate DATE, @DocumentId INT, @OrderSum MONEY, @CustomerId INT) AS \r\n" +
                 "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE Id = @Id OR DocumentId = @DocumentId) \r\n" +
@@ -204,7 +203,7 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "  END \r\n" +
                 "ELSE \r\n" +
                 "  RETURN 404",
-                
+
                 $"CREATE PROCEDURE {OrderProcedures.RemoveOrder}( \r\n" +
                 "@DocumentId INT) AS \r\n" +
                 "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) \r\n" +

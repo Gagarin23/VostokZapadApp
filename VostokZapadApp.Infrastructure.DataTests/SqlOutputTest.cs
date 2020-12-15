@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
+using System.Collections.Generic;
 using VostokZapadApp.Domain.Core.DataBase;
 
 namespace VostokZapadApp.Infrastructure.DataTests
@@ -20,14 +15,14 @@ namespace VostokZapadApp.Infrastructure.DataTests
                       "OUTPUT inserted.Id " +
                       "VALUES ('test1545')";
             int id;
-            
+
             using (var db =
                 new SqlConnection(
                     "Server=(localdb)\\mssqllocaldb;Database=VostokZapadDb;Trusted_Connection=True;MultipleActiveResultSets=true"))
             {
                 id = db.QueryFirst<int>(sql);
             }
-            
+
             Assert.AreNotEqual(0, id);
         }
 
@@ -43,8 +38,8 @@ namespace VostokZapadApp.Infrastructure.DataTests
             {
                 orders = db.Query<Order>(sql);
             }
-            
-            
+
+
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using VostokZapadApp.Domain.Core;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
 using VostokZapadApp.Services.Interfaces;
@@ -25,7 +24,7 @@ namespace VostokZapadApp.Infrastructure.Business
         {
             var id = (await _customerRepository.GetAsync(customerName)).Value.Id;
             if (id == 0)
-                return new ObjectResult("Клиент не найден.") {StatusCode = 404};
+                return new ObjectResult("Клиент не найден.") { StatusCode = 404 };
 
             //...еще какая-то валидация.
 

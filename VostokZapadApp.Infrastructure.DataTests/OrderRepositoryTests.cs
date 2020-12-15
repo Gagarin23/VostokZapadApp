@@ -1,14 +1,9 @@
-﻿using NUnit.Framework;
-using VostokZapadApp.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using VostokZapadApp.Domain.Core.DataBase;
+using NUnit.Framework;
+using System;
+using System.Data;
+using System.Threading.Tasks;
 using VostokZapadApp.Infrastructure.Data.Initialisation;
 
 namespace VostokZapadApp.Infrastructure.Data.Tests
@@ -32,7 +27,7 @@ namespace VostokZapadApp.Infrastructure.Data.Tests
                             "@MinDate DATE, @MaxDate DATE) AS " +
                             "SELECT * FROM Orders " +
                             "WHERE DocDate > @MinDate AND DocDate < @MaxDate";
-            
+
             using (var db = new SqlConnection("Server=(localdb)\\mssqllocaldb;Database=VostokZapadDb;Trusted_Connection=True;MultipleActiveResultSets=true"))
             {
                 var reader = await db.ExecuteReaderAsync(
@@ -53,7 +48,7 @@ namespace VostokZapadApp.Infrastructure.Data.Tests
 
                 var dt = parameters.Get<DateTime>("@dt");
             }
-            
+
         }
     }
 }
