@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Data.SqlClient;
@@ -8,9 +10,9 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
     public interface IDatabaseInitialiser
     {
         Task CreateDatabase();
-        Task CreateTables();
-        Task CreateCustomersProcedures();
-        Task CreateOrdersProcedures();
+        void CreateTables();
+        void CreateCustomersProcedures();
+        void CreateOrdersProcedures();
     }
 
     public class DatabaseInitialiser : IDatabaseInitialiser
@@ -45,153 +47,196 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
             }
         }
 
-        public async Task CreateTables()
+        public void CreateTables()
         {
-            string queryShops = "CREATE TABLE Customers " +
-                                "(Id INT IDENTITY PRIMARY KEY, " +
-                                "Name NVARCHAR(50) UNIQUE)";
-
-            string queryProducts = "CREATE TABLE Orders " +
-                                   "(Id INT IDENTITY PRIMARY KEY, " +
-                                   "DocDate date NOT NULL, " +
-                                   "DocumentId INT UNIQUE NOT NULL, " +
-                                   "OrderSum MONEY NOT NULL, " +
-                                   "CustomerId INT NOT NULL REFERENCES Customers(Id) ON DELETE CASCADE)";
+            var procedures = new List<string>
+            {
+                "CREATE TABLE Customers " +
+                "(Id INT IDENTITY PRIMARY KEY, " +
+                "Name NVARCHAR(50) UNIQUE)",
+                
+                "CREATE TABLE Orders " +
+                "(Id INT IDENTITY PRIMARY KEY, " +
+                "DocDate date NOT NULL, " +
+                "DocumentId INT UNIQUE NOT NULL, " +
+                "OrderSum MONEY NOT NULL, " +
+                "CustomerId INT NOT NULL REFERENCES Customers(Id) ON DELETE CASCADE)"
+            };
 
             if(!_isTablesCreated)
             {
                 using (var db = new SqlConnection(_connectionString))
                 {
-                    await db.ExecuteAsync(queryShops);
-                    await db.ExecuteAsync(queryProducts);
+                    foreach (var procedure in procedures)
+                    {
+                        try //ещё один костыль дабы не выпадать в исключение.
+                        {
+                            db.Execute(procedure);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message); //+ логгирование.
+                        }
+                    }
+                    
                     _isTablesCreated = true;
                 }
             }
         }
 
-        public async Task CreateCustomersProcedures()
+        public void CreateCustomersProcedures()
         {
-            var getByName = $"CREATE PROCEDURE {CustomerProcedures.GetCustomerByName}( " +
-                            "@Name NVARCHAR(50)) AS " +
-                            "SELECT TOP(1) Id, Name FROM Customers " +
-                            "WHERE Name = @Name "; 
-
-            var getById =  $"CREATE PROCEDURE {CustomerProcedures.GetCustomerById}( " +
-                           "@Id INT) AS " +
-                           "SELECT TOP(1) Id, Name FROM Customers " +
-                           "WHERE Id = @Id";
-
-            var add = $"CREATE PROCEDURE {CustomerProcedures.AddCustomer}( " +
-                      "@Name NVARCHAR(50)) AS " +
-                      "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Name = @Name) " +
-                      "    RETURN 400 " +
-                      "ELSE " +
-                      "    BEGIN " +
-                      "         INSERT INTO Customers (Name) " +
-                      "         OUTPUT INSERTED.Id" +
-                      "         VALUES (@Name) " +
-                      "         RETURN 201 " +
-                      "    END";
-            
-            
-            var update = $"CREATE PROCEDURE {CustomerProcedures.UpdateCustomer}( " +
-                                 "@Id INT, @Name NVARCHAR(50)) AS " +
-                                 "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Id = @Id) " +
-                                 "  BEGIN " +
-                                 "      UPDATE Customers SET Name = @Name " +
-                                 "      WHERE Id = @Id " +
-                                 "      RETURN 200 " +
-                                 "  END " +
-                                 "ELSE " +
-                                 "  RETURN 404";
-
-            var removeByName = $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomerByName}( " +
-                         "@Name NVARCHAR(50)) AS " +
-                         "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Name = @Name) " +
-                         "  BEGIN " +
-                         "      DELETE FROM Customers WHERE Name = @Name " +
-                         "      return 200 " +
-                         "  END " +
-                         "ELSE " +
-                         "  return 404";
-
-            var removeById = $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomerById}( " +
-                             "@Id INT) AS " +
-                             "IF EXISTS (SELECT TOP(1) Id FROM Customers WHERE Id = @Id) " +
-                             "  BEGIN " +
-                             "      DELETE FROM Customers WHERE Id = @Id " +
-                             "      return 200 " +
-                             "  END " +
-                             "ELSE " +
-                             "  return 404";
+            var procedures = new List<string>
+            {
+                $"CREATE PROCEDURE {CustomerProcedures.GetCustomerByName}( \r\n" +
+                "@Name NVARCHAR(50)) AS \r\n" +
+                "SELECT TOP(1) Id, Name FROM Customers \r\n" +
+                "WHERE Name = @Name ",
+                
+                $"CREATE PROCEDURE {CustomerProcedures.GetCustomerById}( \r\n" +
+                "@Id INT) AS \r\n" +
+                "SELECT TOP(1) Id, Name FROM Customers \r\n" +
+                "WHERE Id = @Id",
+                
+                $"CREATE PROCEDURE {CustomerProcedures.AddCustomer}( \r\n" +
+                "@Name NVARCHAR(50)) AS \r\n" +
+                "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Name = @Name) \r\n" +
+                "    RETURN 400 \r\n" +
+                "ELSE \r\n" +
+                "    BEGIN \r\n" +
+                "         INSERT INTO Customers (Name) \r\n" +
+                "         OUTPUT INSERTED.Id \r\n" +
+                "         VALUES (@Name) \r\n" +
+                "         RETURN 201 \r\n" +
+                "    END",
+                
+                $"CREATE PROCEDURE {CustomerProcedures.UpdateCustomer}( \r\n" +
+                "@Id INT, @Name NVARCHAR(50)) AS \r\n" +
+                "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Id = @Id) \r\n" +
+                "  BEGIN \r\n" +
+                "      UPDATE Customers SET Name = @Name \r\n" +
+                "      WHERE Id = @Id \r\n" +
+                "      RETURN 200 \r\n" +
+                "  END \r\n" +
+                "ELSE \r\n" +
+                "  RETURN 404",
+                
+                $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomerByName}( \r\n" +
+                "@Name NVARCHAR(50)) AS \r\n" +
+                "IF EXISTS (SELECT TOP(1) Name FROM Customers WHERE Name = @Name) \r\n" +
+                "  BEGIN \r\n" +
+                "      DELETE FROM Customers WHERE Name = @Name \r\n" +
+                "      return 200 \r\n" +
+                "  END \r\n" +
+                "ELSE \r\n" +
+                "  return 404",
+                
+                $"CREATE PROCEDURE {CustomerProcedures.RemoveCustomerById}( \r\n" +
+                "@Id INT) AS \r\n" +
+                "IF EXISTS (SELECT TOP(1) Id FROM Customers WHERE Id = @Id) \r\n" +
+                "  BEGIN \r\n" +
+                "      DELETE FROM Customers WHERE Id = @Id \r\n" +
+                "      return 200 \r\n" +
+                "  END \r\n" +
+                "ELSE \r\n" +
+                "  return 404"
+            };
 
             using (var db = new SqlConnection(_connectionString))
             {
-                await db.ExecuteAsync(getByName);
-                await db.ExecuteAsync(getById);
-                await db.ExecuteAsync(add);
-                await db.ExecuteAsync(update);
-                await db.ExecuteAsync(removeByName);
-                await db.ExecuteAsync(removeById);
+                foreach (var procedure in procedures)
+                {
+                    try 
+                    {
+                        db.Execute(procedure);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message); 
+                    }
+                }
             }
         }
 
-        public async Task CreateOrdersProcedures()
+        public void CreateOrdersProcedures()
         {
-            var getAll = $"CREATE PROCEDURE {OrderProcedures.GetAllOrders} AS " +
-                         "SELECT * FROM Orders";
-
-            var getByDoc = $"CREATE PROCEDURE {OrderProcedures.GetOrderByDocumentId}( " +
-                           "@DocId INT) AS " +
-                           "SELECT TOP(1) * FROM ORDERS WHERE DocumentId = @DocId";
-
-
-            var getByDate = $"CREATE PROCEDURE {OrderProcedures.GetOrdersByDate}( " +
-                            "@MinDate DATE, @MaxDate DATE) AS " +
-                            "SELECT * FROM Orders " +
-                            "WHERE DocDate > @MinDate AND DocDate < @MaxDate";
-
-            var getByCustomer = $"CREATE PROCEDURE {OrderProcedures.GetOrdersByCustomer}( " +
-                                "@Name NVARCHAR(50)) AS " +
-                                "SELECT * FROM Orders as O " +
-                                "WHERE O.CustomerId = (SELECT TOP(1) Id " +
-                                "FROM Customers as C " +
-                                "WHERE C.Name = @Name)";
-
-            var add = $"CREATE PROCEDURE {OrderProcedures.AddOrder}( " +
-                      "@DocDate DATE, @DocId INT, @OrderSum MONEY, @CustomerId INT) AS " +
-                      "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) " +
-                      "VALUES (@DocDate, @DocId, @OrderSum, @CustomerId)";
-
-            var update = $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( " +
-                         "@DocDate DATE, @DocumentId INT, @OrderSum MONEY, @CustomerId INT) AS " +
-                         "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE Id = @Id OR DocumentId = @DocumentId) " +
-                         "  BEGIN " +
-                         "      UPDATE Orders " +
-                         "      SET DocDate = @DocDate, OrderSum = @OrderSum, CustomerId = @CustomerId " +
-                         "      WHERE Id = @Id OR DocumentId = @DocumentId" +
-                         "      RETURN 200 " +
-                         "  END " +
-                         "ELSE " +
-                         "  RETURN 404";
-
-            var removeById = $"CREATE PROCEDURE {OrderProcedures.RemoveOrder}( " +
-                             "@DocumentId INT) AS " +
-                             "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) " +
-                             "  BEGIN " +
-                             "      DELETE FROM Orders WHERE DocumentId = @DocumentId " +
-                             "      return 200 " +
-                             "  END " +
-                             "ELSE " +
-                             "  return 404";
+            var procedures = new List<string>
+            {
+                $"CREATE PROCEDURE {OrderProcedures.GetAllOrders} AS \r\n" +
+                "SELECT * FROM Orders",
+                
+                $"CREATE PROCEDURE {OrderProcedures.GetOrderByDocumentId}( \r\n" +
+                "@DocId INT) AS \r\n" +
+                "SELECT TOP(1) * FROM ORDERS WHERE DocumentId = @DocId",
+                
+                $"CREATE PROCEDURE {OrderProcedures.GetOrdersByDate}( \r\n" +
+                "@MinDate DATE, @MaxDate DATE) AS \r\n" +
+                "SELECT * FROM Orders \r\n" +
+                "WHERE DocDate > @MinDate AND DocDate < @MaxDate",
+                
+                $"CREATE PROCEDURE {OrderProcedures.GetOrdersByCustomer}( \r\n" +
+                "@Name NVARCHAR(50)) AS \r\n" +
+                "SELECT * FROM Orders as O \r\n" +
+                "WHERE O.CustomerId = (SELECT TOP(1) Id \r\n" +
+                "FROM Customers as C \r\n" +
+                "WHERE C.Name = @Name)",
+                
+                $"CREATE PROCEDURE {OrderProcedures.GetOrdersByCustomer}( \r\n" +
+                "@Name NVARCHAR(50)) AS \r\n" +
+                "SELECT * FROM Orders as O \r\n" +
+                "WHERE O.CustomerId = (SELECT TOP(1) Id \r\n" +
+                "FROM Customers as C \r\n" +
+                "WHERE C.Name = @Name)",
+                
+                $"CREATE PROCEDURE {OrderProcedures.GetOrdersByCustomer}( \r\n" +
+                "@Name NVARCHAR(50)) AS \r\n" +
+                "SELECT * FROM Orders as O \r\n" +
+                "WHERE O.CustomerId = (SELECT TOP(1) Id \r\n" +
+                "FROM Customers as C \r\n" +
+                "WHERE C.Name = @Name)",
+                
+                $"CREATE PROCEDURE {OrderProcedures.AddOrder}( \r\n" +
+                "@DocDate DATE, @DocId INT, @OrderSum MONEY, @CustomerId INT) AS \r\n" +
+                "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) \r\n" +
+                "OUTPUT INSERTED.Id \r\n" +
+                "VALUES (@DocDate, @DocId, @OrderSum, @CustomerId)",
+                
+                $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( \r\n" +
+                "@DocDate DATE, @DocumentId INT, @OrderSum MONEY, @CustomerId INT) AS \r\n" +
+                "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE Id = @Id OR DocumentId = @DocumentId) \r\n" +
+                "  BEGIN \r\n" +
+                "      UPDATE Orders \r\n" +
+                "      SET DocDate = @DocDate, OrderSum = @OrderSum, CustomerId = @CustomerId \r\n" +
+                "      WHERE Id = @Id OR DocumentId = @DocumentId \r\n" +
+                "      RETURN 200 \r\n" +
+                "  END \r\n" +
+                "ELSE \r\n" +
+                "  RETURN 404",
+                
+                $"CREATE PROCEDURE {OrderProcedures.RemoveOrder}( \r\n" +
+                "@DocumentId INT) AS \r\n" +
+                "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) \r\n" +
+                "  BEGIN \r\n" +
+                "      DELETE FROM Orders WHERE DocumentId = @DocumentId \r\n" +
+                "      return 200 \r\n" +
+                "  END \r\n" +
+                "ELSE \r\n" +
+                "  return 404"
+            };
 
             using (var db = new SqlConnection(_connectionString))
             {
-                await db.ExecuteAsync(getAll);
-                await db.ExecuteAsync(getByDoc);
-                await db.ExecuteAsync(getByDate);
-                await db.ExecuteAsync(getByCustomer);
-                await db.ExecuteAsync(add);
+                foreach (var procedure in procedures)
+                {
+                    try
+                    {
+                        db.Execute(procedure);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
             }
         }
     }

@@ -80,21 +80,19 @@ namespace VostokZapadApp.Infrastructure.Data
             return orders;
         }
 
-        public async Task<ActionResult> AddAsync(Order order)
+        public async Task<ActionResult<int>> AddAsync(Order order)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@DocDate", order.DocDate, DbType.Date, ParameterDirection.Input);
             parameters.Add("@DocId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@OrderSum", order.OrderSum, DbType.Decimal, ParameterDirection.Input);
             parameters.Add("@CustomerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
+            parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            var result = await _dbConnection.ExecuteAsync(
+            var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(
                 OrderProcedures.AddOrder, parameters, commandType: CommandType.StoredProcedure);
 
-            if(result > 0)
-                return new StatusCodeResult(201);
-
-            return new StatusCodeResult(500);
+            return new ObjectResult(id) {StatusCode = parameters.Get<int>("@statusCode")};
         }
 
         public async Task<ActionResult> UpdateOrInsertAsync(Order order)

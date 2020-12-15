@@ -15,7 +15,7 @@ namespace VostokZapadApp.Domain.Interfaces
         Task<ActionResult<Order>> GetByDocIdAsync(int documentId);
         Task<ActionResult<List<Order>>> GetByDateAsync(DateTime min, DateTime max);
         Task<ActionResult<List<Order>>> GetByCustomerAsync(Customer customer);
-        Task<ActionResult> AddAsync(Order order);
+        Task<ActionResult<int>> AddAsync(Order order);
         Task<ActionResult> UpdateOrInsertAsync(Order order);
         Task<ActionResult> RemoveAsync(int documentId);
     }

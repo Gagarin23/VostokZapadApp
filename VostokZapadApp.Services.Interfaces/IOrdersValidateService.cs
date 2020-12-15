@@ -11,6 +11,6 @@ namespace VostokZapadApp.Services.Interfaces
 {
     public interface IOrdersValidateService
     {
-        Task<ActionResult> AddOrderAsync(DateTime date, int documentId, decimal sum, string customerName);
+        Task<ActionResult<int>> AddOrderAsync(DateTime date, int documentId, decimal sum, string customerName);
     }
 }

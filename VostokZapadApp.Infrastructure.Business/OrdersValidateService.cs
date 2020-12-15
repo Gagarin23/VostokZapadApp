@@ -21,7 +21,7 @@ namespace VostokZapadApp.Infrastructure.Business
             _customerRepository = customerRepository;
         }
 
-        public async Task<ActionResult> AddOrderAsync(DateTime date, int documentId, decimal sum, string customerName)
+        public async Task<ActionResult<int>> AddOrderAsync(DateTime date, int documentId, decimal sum, string customerName)
         {
             var id = (await _customerRepository.GetAsync(customerName)).Value.Id;
             if (id == 0)

@@ -86,9 +86,9 @@ namespace VostokZapadApp.Controllers
         /// <param name="documentId"></param>
         /// <param name="sum"></param>
         /// <param name="customerName"></param>
-        /// <returns></returns>
+        /// <returns>Id добавленного заказа.</returns>
         [HttpPost("/addorder")]
-        public async Task<ActionResult> AddOrder(DateTime date, int documentId, decimal sum, string customerName) //По хорошему тут должена быть своя абстракция на входные данные.
+        public async Task<ActionResult<int>> AddOrder(DateTime date, int documentId, decimal sum, string customerName) //По хорошему тут должена быть своя абстракция на входные данные.
         {
             if (date == DateTime.MinValue || documentId == 0 || sum <= 0 || string.IsNullOrWhiteSpace(customerName))
                 return BadRequest();
@@ -101,7 +101,7 @@ namespace VostokZapadApp.Controllers
         /// </summary>
         /// <param name="documentId"></param>
         /// <returns></returns>
-        [HttpDelete("/del/documentId={documentId}")]
+        [HttpDelete("/del/docId={documentId}")]
         public async Task<ActionResult> Delete(int documentId)
         {
             if (documentId == 0)
