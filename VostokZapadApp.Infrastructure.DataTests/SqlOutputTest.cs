@@ -18,20 +18,17 @@ namespace VostokZapadApp.Infrastructure.DataTests
         {
             var sql = "INSERT INTO Customers (Name) " +
                       "OUTPUT inserted.Id " +
-                      "VALUES ('test14')";
-            var p = new DynamicParameters();
-            p.Add("@@Identity", dbType:DbType.Int32, direction: ParameterDirection.Output);
+                      "VALUES ('test1545')";
+            int id;
             
             using (var db =
                 new SqlConnection(
                     "Server=(localdb)\\mssqllocaldb;Database=VostokZapadDb;Trusted_Connection=True;MultipleActiveResultSets=true"))
             {
-                var a = db.Query<int>(sql);
-                db.Execute(sql,p);
+                id = db.QueryFirst<int>(sql);
             }
-            var result = p.Get<int>("@@Identity");
             
-            Assert.AreNotEqual(0, result);
+            Assert.AreNotEqual(0, id);
         }
 
         [Test]

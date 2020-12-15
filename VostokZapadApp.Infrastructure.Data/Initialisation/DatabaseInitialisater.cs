@@ -181,25 +181,17 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
                 "FROM Customers as C \r\n" +
                 "WHERE C.Name = @Name)",
                 
-                $"CREATE PROCEDURE {OrderProcedures.GetOrdersByCustomer}( \r\n" +
-                "@Name NVARCHAR(50)) AS \r\n" +
-                "SELECT * FROM Orders as O \r\n" +
-                "WHERE O.CustomerId = (SELECT TOP(1) Id \r\n" +
-                "FROM Customers as C \r\n" +
-                "WHERE C.Name = @Name)",
-                
-                $"CREATE PROCEDURE {OrderProcedures.GetOrdersByCustomer}( \r\n" +
-                "@Name NVARCHAR(50)) AS \r\n" +
-                "SELECT * FROM Orders as O \r\n" +
-                "WHERE O.CustomerId = (SELECT TOP(1) Id \r\n" +
-                "FROM Customers as C \r\n" +
-                "WHERE C.Name = @Name)",
-                
                 $"CREATE PROCEDURE {OrderProcedures.AddOrder}( \r\n" +
                 "@DocDate DATE, @DocId INT, @OrderSum MONEY, @CustomerId INT) AS \r\n" +
-                "INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) \r\n" +
-                "OUTPUT INSERTED.Id \r\n" +
-                "VALUES (@DocDate, @DocId, @OrderSum, @CustomerId)",
+                "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocId) \r\n" +
+                "   BEGIN \r\n" +
+                "       INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) \r\n" +
+                "       OUTPUT INSERTED.Id \r\n" +
+                "       VALUES (@DocDate, @DocId, @OrderSum, @CustomerId) \r\n" +
+                "       RETURN 201 \r\n" +
+                "   END \r\n" +
+                "ELSE \r\n" +
+                "   RETURN 400",
                 
                 $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( \r\n" +
                 "@DocDate DATE, @DocumentId INT, @OrderSum MONEY, @CustomerId INT) AS \r\n" +
