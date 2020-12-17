@@ -194,11 +194,11 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation
 
                 $"CREATE PROCEDURE {OrderProcedures.UpdateOrder}( \r\n" +
                 "@DocDate DATE, @DocumentId INT, @OrderSum MONEY, @CustomerId INT) AS \r\n" +
-                "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE Id = @Id OR DocumentId = @DocumentId) \r\n" +
+                "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) \r\n" +
                 "  BEGIN \r\n" +
                 "      UPDATE Orders \r\n" +
                 "      SET DocDate = @DocDate, OrderSum = @OrderSum, CustomerId = @CustomerId \r\n" +
-                "      WHERE Id = @Id OR DocumentId = @DocumentId \r\n" +
+                "      WHERE DocumentId = @DocumentId \r\n" +
                 "      RETURN 200 \r\n" +
                 "  END \r\n" +
                 "ELSE \r\n" +

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Reflection;
 using System.Threading.Tasks;
 using VostokZapadApp.Domain.Core.DataBase;
 using VostokZapadApp.Domain.Interfaces;
@@ -16,6 +17,7 @@ namespace VostokZapadApp.Infrastructure.Data
     public class OrderRepository : IOrderRepository
     {
         private readonly IDbConnection _dbConnection;
+        private readonly PropertyInfo[] _props = typeof(Order).GetProperties();
 
         public OrderRepository(IDbConnection dbConnection)
         {
@@ -35,6 +37,9 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<Order>> GetByDocIdAsync(int documentId)
         {
+            if (documentId < 1)
+                return new BadRequestResult();
+            
             var parameters = new DynamicParameters();
             parameters.Add("@DocId", documentId, DbType.Int32, ParameterDirection.Input);
 
@@ -49,6 +54,9 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<List<Order>>> GetByDateAsync(DateTime minDate, DateTime maxDate)
         {
+            if (minDate > maxDate)
+                return new BadRequestResult();
+            
             var parameters = new DynamicParameters();
             parameters.Add("@MinDate", minDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
             parameters.Add("@MaxDate", maxDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
@@ -64,6 +72,9 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<List<Order>>> GetByCustomerAsync(Customer customer)
         {
+            if (customer == null || customer.Name == null)
+                return new BadRequestResult();
+            
             var parameters = new DynamicParameters();
             parameters.Add("@Name", customer.Name, DbType.String, ParameterDirection.Input);
 
@@ -78,6 +89,19 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<int>> AddAsync(Order order)
         {
+            if (order == null)
+                return new BadRequestResult();
+            
+            #region Cпорная штука, медленная рефлексия. 
+            
+            foreach (var propertyInfo in _props)
+            {
+                if (propertyInfo.GetValue(order) == default)
+                    return new BadRequestResult();
+            }
+            
+            #endregion
+            
             var parameters = new DynamicParameters();
             parameters.Add("@DocDate", order.DocDate, DbType.Date, ParameterDirection.Input);
             parameters.Add("@DocId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
@@ -92,7 +116,20 @@ namespace VostokZapadApp.Infrastructure.Data
         }
 
         public async Task<ActionResult> UpdateOrInsertAsync(Order order)
-        {
+        {            
+            if (order == null)
+                return new BadRequestResult();
+            
+            #region Cпорная штука, медленная рефлексия. 
+            
+            foreach (var propertyInfo in _props)
+            {
+                if (propertyInfo.GetValue(order) == default)
+                    return new BadRequestResult();
+            }
+            
+            #endregion
+            
             var parameters = new DynamicParameters();
             parameters.Add("@docDate", order.DocDate, DbType.Date, ParameterDirection.Input);
             parameters.Add("@docId", order.DocumentId, DbType.Int32, ParameterDirection.Input);
@@ -107,6 +144,9 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult> RemoveAsync(int documentId)
         {
+            if (documentId < 1)
+                return new BadRequestResult();
+            
             var parameters = new DynamicParameters();
             parameters.Add("@documentId", documentId, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);

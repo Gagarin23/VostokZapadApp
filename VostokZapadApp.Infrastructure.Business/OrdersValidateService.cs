@@ -10,13 +10,11 @@ namespace VostokZapadApp.Infrastructure.Business
     public class OrdersValidateService : IOrdersValidateService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly ICustomersValidateService _customersValidate;
         private readonly ICustomerRepository _customerRepository;
 
         public OrdersValidateService(IOrderRepository orderRepository, ICustomersValidateService customersValidate, ICustomerRepository customerRepository)
         {
             _orderRepository = orderRepository;
-            _customersValidate = customersValidate;
             _customerRepository = customerRepository;
         }
 
