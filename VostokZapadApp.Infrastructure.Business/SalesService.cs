@@ -30,6 +30,10 @@ namespace VostokZapadApp.Infrastructure.Business
         public async Task<ActionResult<List<Sales>>> GetByDateAsync(DateTime min, DateTime max)
         {
             var orders = await _orderRepository.GetByDateAsync(min, max);
+
+            if (orders.Value == null)
+                return new NotFoundResult();
+            
             return await GetSalesAsync(orders.Value);
         }
 

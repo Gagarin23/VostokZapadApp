@@ -68,7 +68,7 @@ namespace VostokZapadApp.Infrastructure.Data
             if(id != default)
                 return new ObjectResult(id) { StatusCode = 201 };
 
-            return new BadRequestObjectResult($"{customer.Name} already exist.");
+            return new BadRequestResult();
         }
 
         public async Task<ActionResult> UpdateAsync(Customer customer)
@@ -96,7 +96,7 @@ namespace VostokZapadApp.Infrastructure.Data
             if (customer.Name.Equals(updatedName))
                 return new OkResult();
             
-            return new StatusCodeResult(500);
+            return new NotFoundResult();
         }
 
         public async Task<ActionResult> RemoveAsync(int id)

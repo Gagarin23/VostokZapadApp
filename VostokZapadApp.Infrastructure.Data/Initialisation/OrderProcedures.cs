@@ -15,34 +15,28 @@
                                                             "WHERE C.Name = @Name)";
 
         public static readonly string AddOrder =
-            "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocId) \r\n" +
+            "IF NOT EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocId) \r\n" +
             "   BEGIN \r\n" +
             "       INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) \r\n" +
             "       OUTPUT INSERTED.Id \r\n" +
             "       VALUES (@DocDate, @DocId, @OrderSum, @CustomerId) \r\n" +
-            "       RETURN 201 \r\n" +
-            "   END \r\n" +
-            "ELSE \r\n" +
-            "   RETURN 400";
+            "   END \r\n";
 
         public static readonly string UpdateOrder =
             "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) \r\n" +
             "  BEGIN \r\n" +
             "      UPDATE Orders \r\n" +
             "      SET DocDate = @DocDate, OrderSum = @OrderSum, CustomerId = @CustomerId \r\n" +
+            "      OUTPUT INSERTED.Id \r\n" +
             "      WHERE DocumentId = @DocumentId \r\n" +
-            "      RETURN 200 \r\n" +
-            "  END \r\n" +
-            "ELSE \r\n" +
-            "  RETURN 404";
+            "  END \r\n";
 
         public static readonly string RemoveOrder =
             "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) \r\n" +
             "  BEGIN \r\n" +
-            "      DELETE FROM Orders WHERE DocumentId = @DocumentId \r\n" +
-            "      return 200 \r\n" +
-            "  END \r\n" +
-            "ELSE \r\n" +
-            "  return 404";
+            "      DELETE FROM Orders \r\n" +
+            "      OUTPUT DELETED.Id \r\n" +
+            "      WHERE DocumentId = @DocumentId \r\n" +
+            "  END \r\n";
     }
 }
