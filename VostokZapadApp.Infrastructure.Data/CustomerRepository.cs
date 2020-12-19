@@ -62,11 +62,13 @@ namespace VostokZapadApp.Infrastructure.Data
             
             var parameters = new DynamicParameters();
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
-            parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
             var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(CustomerProcedures.AddCustomer, parameters);
 
-            return new ObjectResult(id) { StatusCode = parameters.Get<int>("@statusCode") };
+            if(id != default)
+                return new ObjectResult(id) { StatusCode = 201 };
+
+            return new BadRequestObjectResult($"{customer.Name} already exist.");
         }
 
         public async Task<ActionResult> UpdateAsync(Customer customer)
@@ -87,12 +89,14 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@id", customer.Id, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
-            parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(
+            var updatedName = await _dbConnection.QuerySingleOrDefaultAsync<string>(
                 CustomerProcedures.UpdateCustomer, parameters);
 
-            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
+            if (customer.Name.Equals(updatedName))
+                return new OkResult();
+            
+            return new StatusCodeResult(500);
         }
 
         public async Task<ActionResult> RemoveAsync(int id)
@@ -102,11 +106,13 @@ namespace VostokZapadApp.Infrastructure.Data
             
             var parameters = new DynamicParameters();
             parameters.Add("@id", id, DbType.String, ParameterDirection.Input);
-            parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerById, parameters);
+            id = await _dbConnection.QuerySingleOrDefaultAsync<int>(CustomerProcedures.RemoveCustomerById, parameters);
 
-            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
+            if (id != default)
+                return new OkResult();
+
+            return new NotFoundResult();
         }
 
         public async Task<ActionResult> RemoveAsync(string customerName)
@@ -116,11 +122,13 @@ namespace VostokZapadApp.Infrastructure.Data
             
             var parameters = new DynamicParameters();
             parameters.Add("@name", customerName, DbType.String, ParameterDirection.Input);
-            parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerByName, parameters);
+            var name = await _dbConnection.QuerySingleOrDefaultAsync<string>(CustomerProcedures.RemoveCustomerByName, parameters);
 
-            return new StatusCodeResult(parameters.Get<int>("@statusCode"));
+            if (name != default)
+                return new OkResult();
+
+            return new NotFoundResult();
         }
     }
 }
