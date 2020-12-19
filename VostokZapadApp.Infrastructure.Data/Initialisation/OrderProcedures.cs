@@ -2,12 +2,47 @@
 {
     public class OrderProcedures
     {
-        public static readonly string GetAllOrders = "GetAllOrders";
-        public static readonly string GetOrderByDocumentId = "GetOrderByDocumentId";
-        public static readonly string GetOrdersByDate = "GetOrdersByDate";
-        public static readonly string GetOrdersByCustomer = "GetOrdersByCustomer";
-        public static readonly string AddOrder = "AddOrder";
-        public static readonly string UpdateOrder = "UpdateOrder";
-        public static readonly string RemoveOrder = "RemoveOrder";
+        public static readonly string GetAllOrders = "SELECT * FROM Orders";
+
+        public static readonly string GetOrderByDocumentId = "SELECT TOP(1) * FROM ORDERS WHERE DocumentId = @DocId";
+
+        public static readonly string GetOrdersByDate = "SELECT * FROM Orders \r\n" +
+                                                        "WHERE DocDate > @MinDate AND DocDate < @MaxDate";
+
+        public static readonly string GetOrdersByCustomer = "SELECT * FROM Orders as O \r\n" +
+                                                            "WHERE O.CustomerId = (SELECT TOP(1) Id \r\n" +
+                                                            "FROM Customers as C \r\n" +
+                                                            "WHERE C.Name = @Name)";
+
+        public static readonly string AddOrder =
+            "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocId) \r\n" +
+            "   BEGIN \r\n" +
+            "       INSERT INTO Orders (DocDate, DocumentId, OrderSum, CustomerId) \r\n" +
+            "       OUTPUT INSERTED.Id \r\n" +
+            "       VALUES (@DocDate, @DocId, @OrderSum, @CustomerId) \r\n" +
+            "       RETURN 201 \r\n" +
+            "   END \r\n" +
+            "ELSE \r\n" +
+            "   RETURN 400";
+
+        public static readonly string UpdateOrder =
+            "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) \r\n" +
+            "  BEGIN \r\n" +
+            "      UPDATE Orders \r\n" +
+            "      SET DocDate = @DocDate, OrderSum = @OrderSum, CustomerId = @CustomerId \r\n" +
+            "      WHERE DocumentId = @DocumentId \r\n" +
+            "      RETURN 200 \r\n" +
+            "  END \r\n" +
+            "ELSE \r\n" +
+            "  RETURN 404";
+
+        public static readonly string RemoveOrder =
+            "IF EXISTS (SELECT TOP(1) Id FROM Orders WHERE DocumentId = @DocumentId) \r\n" +
+            "  BEGIN \r\n" +
+            "      DELETE FROM Orders WHERE DocumentId = @DocumentId \r\n" +
+            "      return 200 \r\n" +
+            "  END \r\n" +
+            "ELSE \r\n" +
+            "  return 404";
     }
 }

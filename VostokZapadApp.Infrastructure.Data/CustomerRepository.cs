@@ -24,8 +24,7 @@ namespace VostokZapadApp.Infrastructure.Data
             if (string.IsNullOrWhiteSpace(name))
                 return new BadRequestResult();
                 
-            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerByName, new { name },
-                commandType: CommandType.StoredProcedure);
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerByName, new { name });
 
             if (result != null)
                 return result;
@@ -38,8 +37,7 @@ namespace VostokZapadApp.Infrastructure.Data
             if (id < 1)
                 return new BadRequestResult();
             
-            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerById, new { id },
-                commandType: CommandType.StoredProcedure);
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<Customer>(CustomerProcedures.GetCustomerById, new { id });
 
             if (result != null)
                 return result;
@@ -66,8 +64,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@name", customer.Name, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(CustomerProcedures.AddCustomer, parameters,
-                commandType: CommandType.StoredProcedure);
+            var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(CustomerProcedures.AddCustomer, parameters);
 
             return new ObjectResult(id) { StatusCode = parameters.Get<int>("@statusCode") };
         }
@@ -93,7 +90,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
             await _dbConnection.ExecuteAsync(
-                CustomerProcedures.UpdateCustomer, parameters, commandType: CommandType.StoredProcedure);
+                CustomerProcedures.UpdateCustomer, parameters);
 
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
@@ -107,7 +104,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@id", id, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerById, parameters, commandType: CommandType.StoredProcedure);
+            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerById, parameters);
 
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }
@@ -121,7 +118,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@name", customerName, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerByName, parameters, commandType: CommandType.StoredProcedure);
+            await _dbConnection.ExecuteAsync(CustomerProcedures.RemoveCustomerByName, parameters);
 
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }

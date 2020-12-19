@@ -26,7 +26,7 @@ namespace VostokZapadApp.Infrastructure.Data
 
         public async Task<ActionResult<List<Order>>> GetAllAsync()
         {
-            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure)
+            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders)
                              as List<Order> ?? new List<Order>();
 
             if (orders.Count < 1)
@@ -43,8 +43,7 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@DocId", documentId, DbType.Int32, ParameterDirection.Input);
 
-            var orders = await _dbConnection.QueryFirstAsync<Order>(OrderProcedures.GetAllOrders,
-                commandType: CommandType.StoredProcedure);
+            var orders = await _dbConnection.QueryFirstAsync<Order>(OrderProcedures.GetAllOrders, parameters);
 
             if (orders == null)
                 return new NotFoundResult();
@@ -61,7 +60,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@MinDate", minDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
             parameters.Add("@MaxDate", maxDate.ToString("yyyy-MM-dd"), DbType.Date, ParameterDirection.Input);
 
-            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure)
+            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, parameters)
                 as List<Order> ?? new List<Order>();
 
             if (orders.Count < 1)
@@ -78,7 +77,7 @@ namespace VostokZapadApp.Infrastructure.Data
             var parameters = new DynamicParameters();
             parameters.Add("@Name", customer.Name, DbType.String, ParameterDirection.Input);
 
-            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, commandType: CommandType.StoredProcedure)
+            var orders = await _dbConnection.QueryAsync<Order>(OrderProcedures.GetAllOrders, parameters)
                 as List<Order> ?? new List<Order>();
 
             if (orders.Count < 1)
@@ -109,8 +108,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@CustomerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.String, direction: ParameterDirection.ReturnValue);
 
-            var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(
-                OrderProcedures.AddOrder, parameters, commandType: CommandType.StoredProcedure);
+            var id = await _dbConnection.QueryFirstOrDefaultAsync<int>(OrderProcedures.AddOrder, parameters);
 
             return new ObjectResult(id) { StatusCode = parameters.Get<int>("@statusCode") };
         }
@@ -137,7 +135,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@customerId", order.CustomerId, DbType.Int32, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            var result = await _dbConnection.ExecuteAsync(OrderProcedures.UpdateOrder, parameters, commandType: CommandType.StoredProcedure);
+            var result = await _dbConnection.ExecuteAsync(OrderProcedures.UpdateOrder, parameters);
 
             return new StatusCodeResult(result);
         }
@@ -151,7 +149,7 @@ namespace VostokZapadApp.Infrastructure.Data
             parameters.Add("@documentId", documentId, DbType.String, ParameterDirection.Input);
             parameters.Add("@statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _dbConnection.ExecuteAsync(OrderProcedures.RemoveOrder, parameters, commandType: CommandType.StoredProcedure);
+            await _dbConnection.ExecuteAsync(OrderProcedures.RemoveOrder, parameters);
 
             return new StatusCodeResult(parameters.Get<int>("@statusCode"));
         }

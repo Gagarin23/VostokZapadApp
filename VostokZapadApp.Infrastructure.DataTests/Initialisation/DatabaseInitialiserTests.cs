@@ -11,16 +11,5 @@ namespace VostokZapadApp.Infrastructure.Data.Initialisation.Tests
         {
             _init = new DatabaseInitialiser("VostokZapadDb");
         }
-        [Test()]
-        public void CreateCustomersProceduresTest()
-        {
-            _init.CreateCustomersProcedures();
-        }
-
-        [Test()]
-        public void CreateOrdersProceduresTest()
-        {
-            _init.CreateOrdersProcedures();
-        }
     }
 }
